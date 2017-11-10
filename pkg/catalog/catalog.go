@@ -32,17 +32,9 @@ func newCatalogListCmd(cl *clientset.Clientset) *cobra.Command {
 				return nil
 			}
 			table := output.NewTable()
-			table.SetHeader([]string{
-				"Name",
-				"Description",
-				"UUID",
-			})
+			output.ClusterServiceClassHeaders(table)
 			for _, class := range classes.Items {
-				table.Append([]string{
-					class.Spec.ExternalName,
-					class.Spec.Description,
-					class.Name,
-				})
+				output.AppendClusterServiceClass(table, &class)
 			}
 			table.Render()
 			return nil

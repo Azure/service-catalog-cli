@@ -3,8 +3,8 @@ package binding
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/instance"
 	"github.com/Azure/service-catalog-cli/pkg/output"
-	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,15 +24,30 @@ func (b *bindingGetCmd) run(name string) error {
 	output.BindingHeaders(t)
 	output.AppendBinding(t, binding)
 	t.Render()
-	instance, err := traverseBindingToInstance(b.cl, binding)
+	inst, err := traverseBindingToInstance(b.cl, binding)
 	if err != nil {
 		return fmt.Errorf("Error traversing binding to its instance (%s)", err)
 	}
 	logger.Printf("\n\nINSTANCE")
 	t = output.NewTable()
 	output.InstanceHeaders(t)
-	output.AppendInstance(t, instance)
+	output.AppendInstance(t, inst)
 	t.Render()
+
+	logger.Printf("\n\nSERVICE CLASS AND SERVICE PLAN")
+	class, _, err := instance.TraverseInstanceToServiceClassAndPlan(b.cl, inst)
+	if err != nil {
+		return fmt.Errorf("Error traversing instance to its service class and plan (%s)", err)
+	}
+	t = output.NewTable()
+	output.ClusterServiceClassHeaders(t)
+	output.AppendClusterServiceClass(t, class)
+	t.Render()
+	// t = output.NewTable()
+	// output.ServicePlanHeaders(t)
+	// output.AppendServicePlan(t)
+	// t.Render()
+
 	return nil
 }
 
@@ -59,18 +74,4 @@ func newBindingGetCmd(cl *clientset.Clientset) *cobra.Command {
 		"The namespace from which to get the binding",
 	)
 	return rootCmd
-}
-
-// traverseBindingToInstance traverses from b to the ServiceInstance that it refers to
-func traverseBindingToInstance(
-	cl *clientset.Clientset,
-	b *v1beta1.ServiceBinding,
-) (*v1beta1.ServiceInstance, error) {
-	ns := b.Namespace
-	instName := b.Spec.ServiceInstanceRef.Name
-	inst, err := cl.Servicecatalog().ServiceInstances(ns).Get(instName, v1.GetOptions{})
-	if err != nil {
-		return nil, err
-	}
-	return inst, nil
 }
