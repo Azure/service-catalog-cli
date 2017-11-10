@@ -42,6 +42,7 @@ func newCatalogListCmd(cl *clientset.Clientset) *cobra.Command {
 					class.Name,
 				})
 			}
+			table.Render()
 			return nil
 		},
 	}
