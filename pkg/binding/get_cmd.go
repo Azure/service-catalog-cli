@@ -99,7 +99,7 @@ func newBindingGetCmd(cl *clientset.Clientset) *cobra.Command {
 		"traverse",
 		"t",
 		false,
-		"Set to true if you'd like to traverse from binding -> instance -> service class/service plan -> broker",
+		"Whether or not to traverse from binding -> instance -> service class/service plan -> broker",
 	)
 	return rootCmd
 }
