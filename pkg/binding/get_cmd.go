@@ -46,6 +46,7 @@ func (b *bindingGetCmd) run(name string) error {
 	output.ClusterServiceClassHeaders(t)
 	output.AppendClusterServiceClass(t, class)
 	t.Render()
+	// TODO: service plan traversal
 	// t = output.NewTable()
 	// output.ServicePlanHeaders(t)
 	// output.AppendServicePlan(t)
