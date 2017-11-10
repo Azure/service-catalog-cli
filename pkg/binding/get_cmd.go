@@ -24,11 +24,11 @@ func (b *bindingGetCmd) run(name string) error {
 	output.BindingHeaders(t)
 	output.AppendBinding(t, binding)
 	t.Render()
-	logger.Printf("\n%s binds to the following instance:\n\n", binding.Name)
 	instance, err := traverseBindingToInstance(b.cl, binding)
 	if err != nil {
 		return fmt.Errorf("Error traversing binding to its instance (%s)", err)
 	}
+	logger.Printf("\n\nINSTANCE")
 	t = output.NewTable()
 	output.InstanceHeaders(t)
 	output.AppendInstance(t, instance)
