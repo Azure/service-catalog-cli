@@ -32,13 +32,13 @@ func newCatalogListCmd(cl *clientset.Clientset) *cobra.Command {
 			table := output.NewTable()
 			table.SetHeader([]string{
 				"Name",
-				"Number of plans",
+				"Description",
 				"UUID",
 			})
 			for _, class := range classes.Items {
 				table.Append([]string{
 					class.Spec.ExternalName,
-					"TODO",
+					class.Spec.Description,
 					class.Name,
 				})
 			}
