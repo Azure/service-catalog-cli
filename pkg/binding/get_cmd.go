@@ -11,8 +11,9 @@ import (
 )
 
 type bindingGetCmd struct {
-	cl *clientset.Clientset
-	ns string
+	cl       *clientset.Clientset
+	ns       string
+	traverse bool
 }
 
 func (b *bindingGetCmd) run(name string) error {
@@ -24,6 +25,10 @@ func (b *bindingGetCmd) run(name string) error {
 	output.BindingHeaders(t)
 	output.AppendBinding(t, binding)
 	t.Render()
+
+	if !b.traverse {
+		return nil
+	}
 
 	// Traverse from binding to instance
 	inst, err := traverse.BindingToInstance(b.cl, binding)
@@ -87,6 +92,13 @@ func newBindingGetCmd(cl *clientset.Clientset) *cobra.Command {
 		"n",
 		"default",
 		"The namespace from which to get the binding",
+	)
+	rootCmd.Flags().BoolVarP(
+		&getCmd.traverse,
+		"traverse",
+		"t",
+		false,
+		"Set to true if you'd like to traverse from binding -> instance -> service class/service plan -> broker",
 	)
 	return rootCmd
 }
