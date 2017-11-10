@@ -23,7 +23,7 @@ func newCatalogListCmd(cl *clientset.Clientset) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			classes, err := cl.Servicecatalog().ClusterServiceClasses().List(v1.ListOptions{})
 			if err != nil {
-				logger.Fatalf("Error fetching ClusterServiceClasses")
+				logger.Fatalf("Error fetching ClusterServiceClasses (%s)", err)
 			}
 			if len(classes.Items) == 0 {
 				logger.Printf("The catalog is empty!")
