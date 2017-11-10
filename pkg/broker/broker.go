@@ -71,12 +71,7 @@ func newBrokerStatusCmd(cl *clientset.Clientset) *cobra.Command {
 			logger.Printf("Broker URL: %s", broker.Spec.URL)
 			t := output.NewTable()
 			t.SetCaption(true, fmt.Sprintf("%d status condition(s)", len(broker.Status.Conditions)))
-			t.SetHeader([]string{
-				"Type",
-				"Status",
-				"Reason",
-				"Message",
-			})
+			output.ClusterServiceBrokerHeaders(t)
 			for _, cond := range broker.Status.Conditions {
 				t.Append([]string{string(cond.Type),
 					string(cond.Status),

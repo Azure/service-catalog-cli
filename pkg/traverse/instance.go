@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// TraverseInstanceToServiceClassAndPlan fetches the ClusterServiceClass and
+// InstanceToServiceClassAndPlan fetches the ClusterServiceClass and
 // ClusterServicePlan for instance, using cl to do the fetches
 func InstanceToServiceClassAndPlan(
 	cl *clientset.Clientset,
