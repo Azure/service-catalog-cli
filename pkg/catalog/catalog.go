@@ -37,7 +37,7 @@ func newCatalogListCmd(cl *clientset.Clientset) *cobra.Command {
 			})
 			for _, class := range classes.Items {
 				table.Append([]string{
-					class.Spec.ClusterServiceBrokerName,
+					class.Spec.ExternalName,
 					"TODO",
 					class.Name,
 				})
