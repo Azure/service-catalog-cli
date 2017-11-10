@@ -1,6 +1,51 @@
 # Service Catalog CLI
 
-A CLI for Kubernetes Service-Catalog
+This project is a command line interface (CLI) for interacting with 
+[Kubernetes Service Catalog](https://github.com/kubernetes-incubator/service-catalog)
+resources.
+
+The goal of the CLI is to provide an easy user interface for Service Catalog users
+to inspect and modify the state of the resources in the system.
+
+This CLI is called `svc-cat` on the command line. See below for a description 
+of the commands that `svc-cat` offers.
+
+# Commands for `ClusterServiceBroker`s
+
+To list all the brokers in the cluster:
+
+```console
+svc-cat broker list
+```
+
+To get the status of an individual broker:
+
+```console
+svc-cat broker status <broker name>
+```
+
+# Commands for `ClusterServiceClass`es
+
+To get a list of all the `ClusterServiceClass`es in the cluster (i.e. the catalog):
+
+```console
+svc-cat catalog list
+```
+# Commands for `ServiceInstance`s
+
+To get a list of all the `ServiceInstance`s in a namespace:
+
+```console
+svc-cat instance list -n <namespace>
+```
+
+# Commands for `ServiceBinding`s
+
+To get a list of all the `ServiceBinding`s in a namespace:
+
+```console
+svc-cat binding list -n <namespace>
+```
 
 # Contributing
 
