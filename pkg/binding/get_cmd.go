@@ -21,20 +21,17 @@ func (b *bindingGetCmd) run(name string) error {
 		return fmt.Errorf("Error getting binding (%s)", err)
 	}
 	t := output.NewTable()
-	t.SetHeader([]string{
-		"Name",
-		"Service Instance Name",
-		"Status",
-	})
-	lastCond := ""
-	if len(binding.Status.Conditions) > 0 {
-		lastCond = binding.Status.Conditions[len(binding.Status.Conditions)-1].Reason
+	output.BindingHeaders(t)
+	output.AppendBinding(t, binding)
+	t.Render()
+	logger.Printf("\n%s binds to the following instance:\n\n", binding.Name)
+	instance, err := traverseBindingToInstance(b.cl, binding)
+	if err != nil {
+		return fmt.Errorf("Error traversing binding to its instance (%s)", err)
 	}
-	t.Append([]string{
-		binding.Name,
-		binding.Spec.ServiceInstanceRef.Name,
-		lastCond,
-	})
+	t = output.NewTable()
+	output.InstanceHeaders(t)
+	output.AppendInstance(t, instance)
 	t.Render()
 	return nil
 }

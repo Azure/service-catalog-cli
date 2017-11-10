@@ -32,27 +32,9 @@ func (i *instanceListCmd) run() error {
 		return fmt.Errorf("Error listing instances (%s)", err)
 	}
 	t := output.NewTable()
-	t.SetHeader([]string{
-		"Name",
-		"Service Class Name",
-		"Service Class UUID",
-		"Service Plan Name",
-		"Service Plan UUID",
-		"Status",
-	})
+	output.InstanceHeaders(t)
 	for _, instance := range instances.Items {
-		latestCond := "None"
-		if len(instance.Status.Conditions) >= 1 {
-			latestCond = instance.Status.Conditions[len(instance.Status.Conditions)-1].Reason
-		}
-		t.Append([]string{
-			instance.Name,
-			instance.Spec.ClusterServiceClassExternalName,
-			instance.Spec.ClusterServiceClassRef.Name,
-			instance.Spec.ClusterServicePlanExternalName,
-			instance.Spec.ClusterServicePlanRef.Name,
-			latestCond,
-		})
+		output.AppendInstance(t, &instance)
 	}
 	t.Render()
 	return nil

@@ -21,21 +21,9 @@ func (b *bindingListCmd) run() error {
 	}
 
 	t := output.NewTable()
-	t.SetHeader([]string{
-		"Name",
-		"Instance Name",
-		"Status",
-	})
+	output.BindingHeaders(t)
 	for _, binding := range bindings.Items {
-		latestCond := "None"
-		if len(binding.Status.Conditions) >= 1 {
-			latestCond = binding.Status.Conditions[len(binding.Status.Conditions)-1].Reason
-		}
-		t.Append([]string{
-			binding.Name,
-			binding.Spec.ServiceInstanceRef.Name,
-			latestCond,
-		})
+		output.AppendBinding(t, &binding)
 	}
 	t.Render()
 	return nil
