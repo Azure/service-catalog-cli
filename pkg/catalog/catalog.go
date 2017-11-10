@@ -17,6 +17,7 @@ func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd.AddCommand(newCatalogListCmd(cl))
 	return rootCmd
 }
+
 func newCatalogListCmd(cl *clientset.Clientset) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
