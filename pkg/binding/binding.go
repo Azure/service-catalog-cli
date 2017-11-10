@@ -13,5 +13,6 @@ func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"bindings", "bnd"},
 	}
 	rootCmd.AddCommand(newBindingListCmd(cl))
+	rootCmd.AddCommand(newBindingGetCmd(cl))
 	return rootCmd
 }
