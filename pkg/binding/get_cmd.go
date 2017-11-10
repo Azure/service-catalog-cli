@@ -42,20 +42,21 @@ func (b *bindingGetCmd) run(name string) error {
 	t.Render()
 
 	// Traverse from instance to service class and plan
-	class, _, err := traverse.InstanceToServiceClassAndPlan(b.cl, inst)
+	class, plan, err := traverse.InstanceToServiceClassAndPlan(b.cl, inst)
 	if err != nil {
 		return fmt.Errorf("Error traversing instance to its service class and plan (%s)", err)
 	}
-	logger.Printf("\n\nSERVICE CLASS AND SERVICE PLAN")
+	logger.Printf("\n\nSERVICE CLASS")
 	t = output.NewTable()
 	output.ClusterServiceClassHeaders(t)
 	output.AppendClusterServiceClass(t, class)
 	t.Render()
-	// TODO: service plan traversal
-	// t = output.NewTable()
-	// output.ServicePlanHeaders(t)
-	// output.AppendServicePlan(t)
-	// t.Render()
+
+	logger.Printf("\n\nSERVICE PLAN")
+	t = output.NewTable()
+	output.ClusterServicePlanHeaders(t)
+	output.AppendClusterServicePlan(t, plan)
+	t.Render()
 
 	// traverse from service class to broker
 	broker, err := traverse.ServiceClassToBroker(b.cl, class)
