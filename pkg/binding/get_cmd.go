@@ -3,8 +3,8 @@ package binding
 import (
 	"fmt"
 
-	"github.com/Azure/service-catalog-cli/pkg/instance"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,7 +24,7 @@ func (b *bindingGetCmd) run(name string) error {
 	output.BindingHeaders(t)
 	output.AppendBinding(t, binding)
 	t.Render()
-	inst, err := traverseBindingToInstance(b.cl, binding)
+	inst, err := traverse.BindingToInstance(b.cl, binding)
 	if err != nil {
 		return fmt.Errorf("Error traversing binding to its instance (%s)", err)
 	}
@@ -35,7 +35,7 @@ func (b *bindingGetCmd) run(name string) error {
 	t.Render()
 
 	logger.Printf("\n\nSERVICE CLASS AND SERVICE PLAN")
-	class, _, err := instance.TraverseInstanceToServiceClassAndPlan(b.cl, inst)
+	class, _, err := traverse.InstanceToServiceClassAndPlan(b.cl, inst)
 	if err != nil {
 		return fmt.Errorf("Error traversing instance to its service class and plan (%s)", err)
 	}

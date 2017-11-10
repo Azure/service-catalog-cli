@@ -1,4 +1,4 @@
-package binding
+package traverse
 
 import (
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
@@ -6,8 +6,8 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// traverseBindingToInstance traverses from b to the ServiceInstance that it refers to
-func traverseBindingToInstance(
+// BindingToInstance traverses from b to the ServiceInstance that it refers to
+func BindingToInstance(
 	cl *clientset.Clientset,
 	b *v1beta1.ServiceBinding,
 ) (*v1beta1.ServiceInstance, error) {

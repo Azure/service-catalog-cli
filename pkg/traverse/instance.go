@@ -1,4 +1,4 @@
-package instance
+package traverse
 
 import (
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
@@ -8,7 +8,7 @@ import (
 
 // TraverseInstanceToServiceClassAndPlan fetches the ClusterServiceClass and
 // ClusterServicePlan for instance, using cl to do the fetches
-func TraverseInstanceToServiceClassAndPlan(
+func InstanceToServiceClassAndPlan(
 	cl *clientset.Clientset,
 	instance *v1beta1.ServiceInstance,
 ) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, error) {
