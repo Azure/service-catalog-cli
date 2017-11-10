@@ -14,7 +14,8 @@ import (
 // of the broker command tree
 func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use: "broker",
+		Use:     "broker",
+		Aliases: []string{"brokers", "brk"},
 	}
 
 	rootCmd.AddCommand(newBrokerListCmd(cl))

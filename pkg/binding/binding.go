@@ -13,7 +13,8 @@ import (
 // command tree
 func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use: "binding",
+		Use:     "binding",
+		Aliases: []string{"bindings", "bnd"},
 	}
 	rootCmd.AddCommand(newBindingListCmd(cl))
 	return rootCmd

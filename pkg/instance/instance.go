@@ -14,7 +14,8 @@ import (
 // command tree
 func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use: "instance",
+		Use:     "instance",
+		Aliases: []string{"instances", "inst"},
 	}
 	rootCmd.AddCommand(newInstanceListCmd(cl))
 	return rootCmd

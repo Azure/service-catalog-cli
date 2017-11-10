@@ -11,7 +11,8 @@ import (
 // catalog command tree
 func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use: "catalog",
+		Use:     "catalog",
+		Aliases: []string{"cat"},
 	}
 	rootCmd.AddCommand(newCatalogListCmd(cl))
 	return rootCmd
