@@ -1,0 +1,26 @@
+version: 2
+jobs:
+  build:
+    working_directory: /go/src/github.com/Azure/service-catalog-cli
+    docker:
+      - image: quay.io/deis/go-dev:v1.2.0
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: make dependencies
+      - run:
+          name: Run Build
+          command: make build
+  test:
+    working_directory: /go/src/github.com/Azure/service-catalog-cli
+    docker:
+       - image: quay.io/deis/go-dev:v1.2.0
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: make dependencies
+      - run:
+          name: Run Tests
+          command: make test
