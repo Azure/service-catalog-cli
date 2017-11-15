@@ -16,7 +16,7 @@ func newBrokerGetCmd(cl *clientset.Clientset) *cobra.Command {
 		Short: "Get the detailed status of an individual ClusterServiceBroker",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
-				return errors.New("Usage: brokers status <broker name>")
+				return errors.New("Usage: brokers get <broker name>")
 			}
 			brokerName := args[0]
 			broker, err := cl.Servicecatalog().ClusterServiceBrokers().Get(brokerName, v1.GetOptions{})
