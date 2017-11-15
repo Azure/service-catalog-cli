@@ -19,8 +19,20 @@ func main() {
 		SilenceUsage: true,
 	}
 
-	kubeContext := "" // TODO: make this configurable
-	cfg, err := kube.ConfigForContext(kubeContext)
+	flags := cmd.PersistentFlags()
+	kubeConfigLocation := flags.String(
+		"config",
+		kube.DefaultConfigLocation(),
+		"the location of the Kubernetes configuration file",
+	)
+	kubeContext := flags.String(
+		"context",
+		"",
+		"the context to use in the Kubernetes configuration file",
+	)
+	flags.Parse(os.Args)
+
+	cfg, err := kube.ConfigForContext(*kubeConfigLocation, *kubeContext)
 	if err != nil {
 		logger.Fatalf("Error getting Kubernetes configuration (%s)", err)
 	}
