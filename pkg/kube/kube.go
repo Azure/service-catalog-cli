@@ -8,10 +8,15 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// DefaultConfigLocation returns the default location of the Kubernetes
+// config file.
+func DefaultConfigLocation() string {
+	return fmt.Sprintf("%s/.kube/config", os.Getenv("HOME"))
+}
+
 // ConfigForContext gets the Kubernetes REST configuration, for the given context,
 // from the default Kubernetes configuration file on disk
-func ConfigForContext(context string) (*rest.Config, error) {
-	configLocation := fmt.Sprintf("%s/.kube/config", os.Getenv("HOME")) // TODO: allow this to be overridden
+func ConfigForContext(configLocation string, context string) (*rest.Config, error) {
 	config, err := getConfig(context, configLocation).ClientConfig()
 	if err != nil {
 		return nil, fmt.Errorf("could not get Kubernetes config for context %q: %s", context, err)
