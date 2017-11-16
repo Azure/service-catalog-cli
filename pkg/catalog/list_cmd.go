@@ -10,7 +10,7 @@ import (
 func newCatalogListCmd(cl *clientset.Clientset) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
-		Short: "Return a list of items in the catalog",
+		Short: "Return a list of ClusterServiceClasses in the catalog",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			classes, err := cl.Servicecatalog().ClusterServiceClasses().List(v1.ListOptions{})
 			if err != nil {
