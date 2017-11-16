@@ -12,8 +12,8 @@ import (
 
 func newListCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "get",
-		Short: "Get detailed information about a ClusterServicePlan",
+		Use:   "list",
+		Short: "List all the ClusterServicePlans",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			plans, err := cl.Servicecatalog().ClusterServicePlans().List(v1.ListOptions{})
 			if err != nil {
