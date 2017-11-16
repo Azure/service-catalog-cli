@@ -6,12 +6,14 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/binding"
 	"github.com/Azure/service-catalog-cli/pkg/broker"
+	"github.com/Azure/service-catalog-cli/pkg/catalog"
 	"github.com/Azure/service-catalog-cli/pkg/class"
 	"github.com/Azure/service-catalog-cli/pkg/instance"
 	"github.com/Azure/service-catalog-cli/pkg/kube"
 	"github.com/Azure/service-catalog-cli/pkg/plan"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
+	"k8s.io/client-go/rest"
 )
 
 // These are build-time values, set during an official release
@@ -44,23 +46,40 @@ func main() {
 	cmd.Flags().BoolVarP(&opts.Version, "version", "v", false, "Show the application version")
 
 	flags := cmd.PersistentFlags()
-	kubeConfigLocation := flags.String(
-		"config",
-		kube.DefaultConfigLocation(),
-		"the location of the Kubernetes configuration file",
-	)
-	kubeContext := flags.String(
-		"context",
-		"",
-		"the context to use in the Kubernetes configuration file",
-	)
-	flags.Parse(os.Args)
 
-	cfg, err := kube.ConfigForContext(*kubeConfigLocation, *kubeContext)
+	settings.AddFlags(flags)
+
+	flags.Parse(args)
+
+	// set defaults from environment
+	settings.Init(flags)
+
+	_, client, _ := getKubeClient(settings.KubeContext)
+
+	cmd.AddCommand(broker.NewRootCmd(client))
+	cmd.AddCommand(catalog.NewRootCmd(client))
+	cmd.AddCommand(instance.NewRootCmd(client))
+	cmd.AddCommand(binding.NewRootCmd(client))
+
+	return cmd
+}
+
+// configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
+func configForContext(context string) (*rest.Config, error) {
+	config, err := kube.GetConfig(context, settings.KubeConfig).ClientConfig()
+	if err != nil {
+		return nil, fmt.Errorf("could not get Kubernetes config for context %q: %s", context, err)
+	}
+	return config, nil
+}
+
+// getKubeClient creates a Kubernetes config and client for a given kubeconfig context.
+func getKubeClient(context string) (*rest.Config, *clientset.Clientset, error) {
+	config, err := configForContext(settings.KubeContext)
 	if err != nil {
 		logger.Fatalf("Error getting Kubernetes configuration (%s)", err)
 	}
-	cl, err := clientset.NewForConfig(cfg)
+	client, err := clientset.NewForConfig(config)
 	if err != nil {
 		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
 	}
@@ -69,6 +88,11 @@ func main() {
 	cmd.AddCommand(newDescribeCmd(cl))
 	cmd.AddCommand(newSyncCmd(cl))
 
+	return nil, client, nil
+}
+
+func main() {
+	cmd := newRootCmd(os.Args[1:])
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
