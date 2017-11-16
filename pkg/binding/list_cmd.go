@@ -20,7 +20,7 @@ func (b *bindingListCmd) run() error {
 		return fmt.Errorf("Error listing bindings (%s)", err)
 	}
 
-	t := output.NewTable()
+	t := output.NewTable(0)
 	output.BindingHeaders(t)
 	for _, binding := range bindings.Items {
 		output.AppendBinding(t, &binding)

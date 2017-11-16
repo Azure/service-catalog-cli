@@ -31,7 +31,7 @@ func newCatalogListCmd(cl *clientset.Clientset) *cobra.Command {
 				logger.Printf("The catalog is empty!")
 				return nil
 			}
-			table := output.NewTable()
+			table := output.NewTable(0)
 			output.ClusterServiceClassHeaders(table)
 			for _, class := range classes.Items {
 				output.AppendClusterServiceClass(table, &class)

@@ -26,7 +26,7 @@ func (i *instanceGetCmd) run(args []string) error {
 	if err != nil {
 		return fmt.Errorf("Error getting instance %s (%s)", instanceName, err)
 	}
-	t := output.NewTable()
+	t := output.NewTable(0)
 	output.InstanceHeaders(t)
 	output.AppendInstance(t, instance)
 	t.Render()
@@ -40,13 +40,13 @@ func (i *instanceGetCmd) run(args []string) error {
 		return fmt.Errorf("Error traversing instance to its service class and plan (%s)", err)
 	}
 	logger.Printf("\n\nSERVICE CLASS")
-	t = output.NewTable()
+	t = output.NewTable(1)
 	output.ClusterServiceClassHeaders(t)
 	output.AppendClusterServiceClass(t, class)
 	t.Render()
 
 	logger.Printf("\n\nSERVICE PLAN")
-	t = output.NewTable()
+	t = output.NewTable(1)
 	output.ClusterServicePlanHeaders(t)
 	output.AppendClusterServicePlan(t, plan)
 	t.Render()
@@ -57,7 +57,7 @@ func (i *instanceGetCmd) run(args []string) error {
 		return fmt.Errorf("Error traversing service class to broker (%s)", err)
 	}
 	logger.Printf("\n\nBROKER")
-	t = output.NewTable()
+	t = output.NewTable(2)
 	output.ClusterServiceBrokerHeaders(t)
 	output.AppendClusterServiceBroker(t, broker)
 	t.Render()
