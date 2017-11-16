@@ -11,6 +11,7 @@ func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "binding",
 		Aliases: []string{"bindings", "bnd"},
+		Short:   "Access ServiceBindinds",
 	}
 	rootCmd.AddCommand(newBindingListCmd(cl))
 	rootCmd.AddCommand(newBindingGetCmd(cl))

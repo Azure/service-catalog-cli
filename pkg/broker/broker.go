@@ -11,6 +11,7 @@ func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "broker",
 		Aliases: []string{"brokers", "brk"},
+		Short:   "Access ClusterServiceBrokers",
 	}
 
 	rootCmd.AddCommand(newBrokerListCmd(cl))

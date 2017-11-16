@@ -1,6 +1,9 @@
 package output
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/olekukonko/tablewriter"
 )
@@ -12,6 +15,8 @@ func ClusterServiceClassHeaders(table *tablewriter.Table) {
 		"Name",
 		"Description",
 		"UUID",
+		"Bindable",
+		"Tags",
 	})
 }
 
@@ -22,5 +27,7 @@ func AppendClusterServiceClass(table *tablewriter.Table, class *v1beta1.ClusterS
 		class.Spec.ExternalName,
 		class.Spec.Description,
 		class.Name,
+		fmt.Sprintf("%t", class.Spec.Bindable),
+		strings.Join(class.Spec.Tags, ", "),
 	})
 }
