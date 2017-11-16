@@ -19,7 +19,7 @@ func (i *instanceListCmd) run() error {
 	if err != nil {
 		return fmt.Errorf("Error listing instances (%s)", err)
 	}
-	t := output.NewTable()
+	t := output.NewTable(0)
 	output.InstanceHeaders(t)
 	for _, instance := range instances.Items {
 		output.AppendInstance(t, &instance)

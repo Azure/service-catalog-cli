@@ -21,7 +21,7 @@ func (b *bindingGetCmd) run(name string) error {
 	if err != nil {
 		return fmt.Errorf("Error getting binding (%s)", err)
 	}
-	t := output.NewTable()
+	t := output.NewTable(0)
 	output.BindingHeaders(t)
 	output.AppendBinding(t, binding)
 	t.Render()
@@ -36,7 +36,7 @@ func (b *bindingGetCmd) run(name string) error {
 		return fmt.Errorf("Error traversing binding to its instance (%s)", err)
 	}
 	logger.Printf("\n\nINSTANCE")
-	t = output.NewTable()
+	t = output.NewTable(1)
 	output.InstanceHeaders(t)
 	output.AppendInstance(t, inst)
 	t.Render()
@@ -47,13 +47,13 @@ func (b *bindingGetCmd) run(name string) error {
 		return fmt.Errorf("Error traversing instance to its service class and plan (%s)", err)
 	}
 	logger.Printf("\n\nSERVICE CLASS")
-	t = output.NewTable()
+	t = output.NewTable(2)
 	output.ClusterServiceClassHeaders(t)
 	output.AppendClusterServiceClass(t, class)
 	t.Render()
 
 	logger.Printf("\n\nSERVICE PLAN")
-	t = output.NewTable()
+	t = output.NewTable(2)
 	output.ClusterServicePlanHeaders(t)
 	output.AppendClusterServicePlan(t, plan)
 	t.Render()
@@ -64,7 +64,7 @@ func (b *bindingGetCmd) run(name string) error {
 		return fmt.Errorf("Error traversing service class to broker (%s)", err)
 	}
 	logger.Printf("\n\nBROKER")
-	t = output.NewTable()
+	t = output.NewTable(3)
 	output.ClusterServiceBrokerHeaders(t)
 	output.AppendClusterServiceBroker(t, broker)
 	t.Render()

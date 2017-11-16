@@ -22,7 +22,7 @@ func newBrokerListCmd(cl *clientset.Clientset) *cobra.Command {
 				logger.Printf("No brokers are installed!")
 				return nil
 			}
-			table := output.NewTable()
+			table := output.NewTable(0)
 			table.SetHeader([]string{"Name", "URL", "Status"})
 			for _, broker := range lst.Items {
 				latestCond := "None"

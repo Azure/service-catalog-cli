@@ -24,7 +24,7 @@ func newBrokerGetCmd(cl *clientset.Clientset) *cobra.Command {
 				return fmt.Errorf("Error getting broker (%s)", err)
 			}
 			logger.Printf("Broker URL: %s", broker.Spec.URL)
-			t := output.NewTable()
+			t := output.NewTable(0)
 			t.SetCaption(true, fmt.Sprintf("%d status condition(s)", len(broker.Status.Conditions)))
 			output.ClusterServiceBrokerHeaders(t)
 			output.AppendClusterServiceBroker(t, broker)
