@@ -12,6 +12,7 @@ func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "instance",
 		Aliases: []string{"instances", "inst"},
+		Short:   "Access ServiceInstances",
 	}
 	rootCmd.AddCommand(newInstanceListCmd(cl))
 	rootCmd.AddCommand(newInstanceGetCmd(cl))
