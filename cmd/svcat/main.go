@@ -8,6 +8,7 @@ import (
 	"github.com/Azure/service-catalog-cli/pkg/broker"
 	"github.com/Azure/service-catalog-cli/pkg/catalog"
 	"github.com/Azure/service-catalog-cli/pkg/class"
+	"github.com/Azure/service-catalog-cli/pkg/environment"
 	"github.com/Azure/service-catalog-cli/pkg/instance"
 	"github.com/Azure/service-catalog-cli/pkg/kube"
 	"github.com/Azure/service-catalog-cli/pkg/plan"
@@ -47,14 +48,10 @@ func main() {
 
 	flags := cmd.PersistentFlags()
 
-	settings.AddFlags(flags)
+	// adds the appropriate persistent flags, parses them, and negotiates values based on existing environment variables
+	vars := environment.New(args, flags)
 
-	flags.Parse(args)
-
-	// set defaults from environment
-	settings.Init(flags)
-
-	_, client, _ := getKubeClient(settings.KubeContext)
+	_, client, _ := getKubeClient(vars)
 
 	cmd.AddCommand(broker.NewRootCmd(client))
 	cmd.AddCommand(catalog.NewRootCmd(client))
@@ -65,17 +62,17 @@ func main() {
 }
 
 // configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
-func configForContext(context string) (*rest.Config, error) {
-	config, err := kube.GetConfig(context, settings.KubeConfig).ClientConfig()
+func configForContext(vars environment.EnvSettings) (*rest.Config, error) {
+	config, err := kube.GetConfig(vars.KubeContext, vars.KubeConfig).ClientConfig()
 	if err != nil {
-		return nil, fmt.Errorf("could not get Kubernetes config for context %q: %s", context, err)
+		return nil, fmt.Errorf("could not get Kubernetes config for context %q: %s", vars.KubeContext, err)
 	}
 	return config, nil
 }
 
 // getKubeClient creates a Kubernetes config and client for a given kubeconfig context.
-func getKubeClient(context string) (*rest.Config, *clientset.Clientset, error) {
-	config, err := configForContext(settings.KubeContext)
+func getKubeClient(vars environment.EnvSettings) (*rest.Config, *clientset.Clientset, error) {
+	config, err := configForContext(vars)
 	if err != nil {
 		logger.Fatalf("Error getting Kubernetes configuration (%s)", err)
 	}
