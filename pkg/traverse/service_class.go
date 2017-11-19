@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ServiceClassToBroker fetches the fetches the ClusterServiceBroker for the given
+// ServiceClassToBroker fetches the ClusterServiceBroker for the given
 // ClusterServiceClass, using cl to do the fetch
 func ServiceClassToBroker(
 	cl *clientset.Clientset,
