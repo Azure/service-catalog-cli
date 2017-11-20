@@ -23,7 +23,7 @@ svc-cat broker list
 To get the status of an individual broker:
 
 ```console
-svc-cat broker status <broker name>
+svc-cat broker get <broker name>
 ```
 
 # Commands for `ClusterServiceClass`es
