@@ -1,19 +1,19 @@
-package catalog
+package class
 
 import (
-	"github.com/Azure/service-catalog-cli/pkg/catalog/class"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
 
 // NewRootCmd creates a new cobra command that represents the root of the
-// catalog command tree
+// catalog class command tree
 func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:     "catalog",
-		Aliases: []string{"cat"},
+		Use:     "class",
+		Aliases: []string{"cl", "classes"},
 	}
 
-	rootCmd.AddCommand(class.NewRootCmd(cl))
+	rootCmd.AddCommand(newClassGetCmd(cl))
+	rootCmd.AddCommand(newClassListCmd(cl))
 	return rootCmd
 }
