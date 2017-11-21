@@ -28,3 +28,15 @@ func AppendClusterServicePlan(table *tablewriter.Table, plan *v1beta1.ClusterSer
 		plan.Spec.ClusterServiceClassRef.Name,
 	})
 }
+
+// WriteClusterServicePlanList prints a list of service class plans to the console
+// When summaryOnly is true, only the names and descriptions are displayed.
+func WriteClusterServicePlanList(plans *v1beta1.ClusterServicePlanList, summaryOnly bool) {
+	t := NewListTable()
+	t.SetHeader([]string{"Name", "Description"})
+
+	for _, plan := range plans.Items {
+		t.Append([]string{plan.Spec.ExternalName, plan.Spec.Description})
+	}
+	t.Render()
+}
