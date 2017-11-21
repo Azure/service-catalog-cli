@@ -13,6 +13,7 @@ func NewRootCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"cl", "classes"},
 	}
 
+	rootCmd.AddCommand(newClassGetCmd(cl))
 	rootCmd.AddCommand(newClassListCmd(cl))
 	return rootCmd
 }
