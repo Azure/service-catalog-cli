@@ -14,6 +14,8 @@ Reviewers have the following general responsibilities:
 - Ensuring that the code is easy to read and of generally good quality
 - Ensuring that tests pass
 - Ensuring that documentation (in-code and otherwise) is clear and complete
+- Ensuring that backwards incompatible changes are made intentionally and that the
+  CLI version is incremented appropriately.
 
 Above everything else, reviewers should provide their feedback in a constructive, respectful
 manner that encourages future contributions and provides a safe, comfortable and efficient
