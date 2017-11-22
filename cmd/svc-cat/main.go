@@ -5,9 +5,10 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/binding"
 	"github.com/Azure/service-catalog-cli/pkg/broker"
-	"github.com/Azure/service-catalog-cli/pkg/catalog"
+	"github.com/Azure/service-catalog-cli/pkg/class"
 	"github.com/Azure/service-catalog-cli/pkg/instance"
 	"github.com/Azure/service-catalog-cli/pkg/kube"
+	"github.com/Azure/service-catalog-cli/pkg/plan"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +42,8 @@ func main() {
 		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
 	}
 	cmd.AddCommand(broker.NewRootCmd(cl))
-	cmd.AddCommand(catalog.NewRootCmd(cl))
+	cmd.AddCommand(class.NewRootCmd(cl))
+	cmd.AddCommand(plan.NewRootCmd(cl))
 	cmd.AddCommand(instance.NewRootCmd(cl))
 	cmd.AddCommand(binding.NewRootCmd(cl))
 
