@@ -7,11 +7,11 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func getStatusText(status v1beta1.ClusterServiceClassStatus) string {
+func getClassStatusText(status v1beta1.ClusterServiceClassStatus) string {
 	if status.RemovedFromBrokerCatalog {
-		return "deprecated"
+		return statusDeprecated
 	}
-	return "active"
+	return statusActive
 }
 
 // ClusterServiceClassHeaders sets the appropriate headers on t for displaying
@@ -52,14 +52,14 @@ func WriteClusterServiceClassList(classes []v1beta1.ClusterServiceClass) {
 	t.Render()
 }
 
-// WriteClusterServiceClassDetails prints a service class to the console.
+// WriteClusterServiceClass prints a service class to the console.
 func WriteClusterServiceClass(class *v1beta1.ClusterServiceClass) {
 	t := NewDetailsTable()
 	t.AppendBulk([][]string{
 		{"Name:", class.Spec.ExternalName},
 		{"Description:", class.Spec.Description},
 		{"UUID:", string(class.Name)},
-		{"Status:", getStatusText(class.Status)},
+		{"Status:", getClassStatusText(class.Status)},
 		{"Tags:", strings.Join(class.Spec.Tags, ", ")},
 	})
 	t.Render()
