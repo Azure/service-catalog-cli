@@ -56,7 +56,7 @@ func WriteAssociatedInstances(instances *v1beta1.ServiceInstanceList) {
 	t.SetHeader([]string{
 		"Name",
 		"Namespace",
-		"Description",
+		"Status",
 	})
 	for _, instance := range instances.Items {
 		t.Append([]string{
