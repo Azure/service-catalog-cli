@@ -41,14 +41,24 @@ func main() {
 	if err != nil {
 		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
 	}
-	cmd.AddCommand(broker.NewRootCmd(cl))
-	cmd.AddCommand(class.NewRootCmd(cl))
-	cmd.AddCommand(plan.NewRootCmd(cl))
-	cmd.AddCommand(instance.NewRootCmd(cl))
-	cmd.AddCommand(binding.NewRootCmd(cl))
+
+	cmd.AddCommand(newGetCmd(cl))
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
 
+func newGetCmd(cl *clientset.Clientset) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get",
+		Short: "List a resource, optionally filtered by name",
+	}
+	cmd.AddCommand(binding.NewGetCmd(cl))
+	cmd.AddCommand(broker.NewGetCmd(cl))
+	cmd.AddCommand(class.NewGetCmd(cl))
+	cmd.AddCommand(instance.NewGetCmd(cl))
+	cmd.AddCommand(plan.NewGetCmd(cl))
+
+	return cmd
 }
