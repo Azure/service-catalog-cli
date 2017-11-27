@@ -55,13 +55,13 @@ func AppendClusterServicePlan(table *tablewriter.Table, plan *v1beta1.ClusterSer
 }
 
 // WritePlanList prints a list of plans.
-func WritePlanList(plans *v1beta1.ClusterServicePlanList, classes *v1beta1.ClusterServiceClassList) {
+func WritePlanList(plans []v1beta1.ClusterServicePlan, classes []v1beta1.ClusterServiceClass) {
 	classNames := map[string]string{}
-	for _, class := range classes.Items {
+	for _, class := range classes {
 		classNames[class.Name] = class.Spec.ExternalName
 	}
 
-	sort.Sort(byClass(plans.Items))
+	sort.Sort(byClass(plans))
 
 	t := NewListTable()
 	t.SetHeader([]string{
@@ -69,7 +69,7 @@ func WritePlanList(plans *v1beta1.ClusterServicePlanList, classes *v1beta1.Clust
 		"Class",
 		"Description",
 		"UUID"})
-	for _, plan := range plans.Items {
+	for _, plan := range plans {
 		t.Append([]string{
 			plan.Spec.ExternalName,
 			classNames[plan.Spec.ClusterServiceClassRef.Name],
@@ -101,7 +101,7 @@ func WriteAssociatedPlans(plans []v1beta1.ClusterServicePlan) {
 	t.Render()
 }
 
-// WritePlanDetails prints a service plan to the console.
+// WritePlanDetails prints a plan to the console.
 func WritePlanDetails(plan *v1beta1.ClusterServicePlan, class *v1beta1.ClusterServiceClass) {
 	t := NewDetailsTable()
 

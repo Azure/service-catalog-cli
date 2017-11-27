@@ -70,6 +70,7 @@ func newDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 		Short: "Show details of a specific resource",
 	}
 	cmd.AddCommand(class.NewDescribeCmd(cl))
+	cmd.AddCommand(plan.NewDescribeCmd(cl))
 
 	return cmd
 }

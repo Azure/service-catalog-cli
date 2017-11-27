@@ -8,17 +8,10 @@ import (
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
-)
-
-const (
-	fieldExternalName    = "spec.externalName"
-	fieldServiceClassRef = "spec.clusterServicePlanRef.name"
 )
 
 type getCmd struct {
 	cl           *clientset.Clientset
-	traverse     bool
 	lookupByUUID bool
 }
 
@@ -38,13 +31,6 @@ func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 			return getCmd.run(args)
 		},
 	}
-	cmd.Flags().BoolVarP(
-		&getCmd.traverse,
-		"traverse",
-		"t",
-		false,
-		"Whether or not to traverse from plan -> class -> broker",
-	)
 	cmd.Flags().BoolVarP(
 		&getCmd.lookupByUUID,
 		"uuid",
@@ -67,64 +53,35 @@ func (c *getCmd) run(args []string) error {
 func (c *getCmd) getAll() error {
 	plans, err := c.cl.ServicecatalogV1beta1().ClusterServicePlans().List(v1.ListOptions{})
 	if err != nil {
-		logger.Fatalf("Error fetching ClusterServicePlans (%s)", err)
+		return fmt.Errorf("unable to list plans (%s)", err)
 	}
 
 	// Retrieve the classes as well because plans don't have the external class name
 	classes, err := c.cl.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
 	if err != nil {
-		logger.Fatalf("Error fetching ClusterServiceClasses (%s)", err)
+		return fmt.Errorf("unable to list classes (%s)", err)
 	}
 
-	output.WritePlanList(plans, classes)
+	output.WritePlanList(plans.Items, classes.Items)
 	return nil
 }
 
 func (c *getCmd) get(key string) error {
 	var plan *v1beta1.ClusterServicePlan
+	var err error
 	if c.lookupByUUID {
-		var err error
-		uuid := key
-		plan, err = c.cl.ServicecatalogV1beta1().ClusterServicePlans().Get(uuid, v1.GetOptions{})
-		if err != nil {
-			return fmt.Errorf("unable to get ClusterServicePlan (%s)", err)
-		}
+		plan, err = retrieveByUUID(c.cl, key)
 	} else {
-		name := key
-		svcOpts := v1.ListOptions{
-			FieldSelector: fields.OneTermEqualSelector(fieldExternalName, name).String(),
-		}
-		searchResults, err := c.cl.ServicecatalogV1beta1().ClusterServicePlans().List(svcOpts)
-		if err != nil {
-			return fmt.Errorf("unable to search ClusterServicePlans (%s)", err)
-		}
-		if len(searchResults.Items) == 0 {
-			logger.Fatalf(`ClusterServicePlan "%s" not found`, name)
-		}
-		if len(searchResults.Items) > 1 {
-			logger.Fatalf(`ClusterServicePlan %s = "%s" matches more than one item`, fieldExternalName, name)
-		}
-		plan = &searchResults.Items[0]
+		plan, err = retrieveByName(c.cl, key)
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
 	class, err := c.cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
 	if err != nil {
-		return fmt.Errorf("unable to get ClusterServiceClass (%s)", err)
+		return fmt.Errorf("unable to get class '%s' (%s)", plan.Spec.ClusterServiceClassRef.Name, err)
 	}
 
-	output.WritePlanDetails(plan, class)
-
-	if c.traverse {
-		planOpts := v1.ListOptions{
-			FieldSelector: fields.OneTermEqualSelector(fieldServiceClassRef, plan.Name).String(),
-		}
-		instances, err := c.cl.ServicecatalogV1beta1().ServiceInstances("").List(planOpts)
-		if err != nil {
-			return fmt.Errorf("unable to list ServiceInstances (%s)", err)
-		}
-		output.WriteAssociatedInstances(instances)
-	}
+	output.WritePlanList([]v1beta1.ClusterServicePlan{*plan}, []v1beta1.ClusterServiceClass{*class})
 
 	return nil
 }
