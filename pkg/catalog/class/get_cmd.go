@@ -65,12 +65,7 @@ func (c *classGetCmd) run(args []string) error {
 			return fmt.Errorf("unable to list ClusterServicePlans (%s)", err)
 		}
 
-		fmt.Println("\nPlans:")
-		if len(plans.Items) == 0 {
-			fmt.Println("No plans defined")
-		} else {
-			output.WriteClusterServicePlanList(plans, true)
-		}
+		output.WriteAssociatedPlans(plans)
 	}
 
 	return nil

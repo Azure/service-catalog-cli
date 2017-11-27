@@ -1,9 +1,18 @@
 package output
 
 import (
+	"fmt"
+
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/olekukonko/tablewriter"
 )
+
+func getInstanceStatusText(status v1beta1.ServiceInstanceStatus) string {
+	if len(status.Conditions) >= 1 {
+		return status.Conditions[len(status.Conditions)-1].Reason
+	}
+	return statusNone
+}
 
 // InstanceHeaders sets the appropriate headers on t for displaying ServiceInstances
 // in t
@@ -33,4 +42,28 @@ func AppendInstance(t *tablewriter.Table, instance *v1beta1.ServiceInstance) {
 		instance.Spec.ClusterServicePlanRef.Name,
 		latestCond,
 	})
+}
+
+// WriteAssociatedInstances prints a list of instances associated with a service plan.
+func WriteAssociatedInstances(instances *v1beta1.ServiceInstanceList) {
+	fmt.Println("\nInstances:")
+	if len(instances.Items) == 0 {
+		fmt.Println("No instances defined")
+		return
+	}
+
+	t := NewListTable()
+	t.SetHeader([]string{
+		"Name",
+		"Namespace",
+		"Status",
+	})
+	for _, instance := range instances.Items {
+		t.Append([]string{
+			instance.Name,
+			instance.Namespace,
+			getInstanceStatusText(instance.Status),
+		})
+	}
+	t.Render()
 }
