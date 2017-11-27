@@ -72,6 +72,7 @@ func newDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	cmd.AddCommand(binding.NewDescribeCmd(cl))
 	cmd.AddCommand(broker.NewDescribeCmd(cl))
 	cmd.AddCommand(class.NewDescribeCmd(cl))
+	cmd.AddCommand(instance.NewDescribeCmd(cl))
 	cmd.AddCommand(plan.NewDescribeCmd(cl))
 
 	return cmd
