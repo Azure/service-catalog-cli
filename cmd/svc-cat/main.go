@@ -69,6 +69,7 @@ func newDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 		Use:   "describe",
 		Short: "Show details of a specific resource",
 	}
+	cmd.AddCommand(binding.NewDescribeCmd(cl))
 	cmd.AddCommand(class.NewDescribeCmd(cl))
 	cmd.AddCommand(plan.NewDescribeCmd(cl))
 
