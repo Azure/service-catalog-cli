@@ -80,9 +80,9 @@ func WritePlanList(plans *v1beta1.ClusterServicePlanList, classes *v1beta1.Clust
 }
 
 // WriteAssociatedPlans prints a list of plans associated with a class.
-func WriteAssociatedPlans(plans *v1beta1.ClusterServicePlanList) {
+func WriteAssociatedPlans(plans []v1beta1.ClusterServicePlan) {
 	fmt.Println("\nPlans:")
-	if len(plans.Items) == 0 {
+	if len(plans) == 0 {
 		fmt.Println("No plans defined")
 		return
 	}
@@ -92,7 +92,7 @@ func WriteAssociatedPlans(plans *v1beta1.ClusterServicePlanList) {
 		"Name",
 		"Description",
 	})
-	for _, plan := range plans.Items {
+	for _, plan := range plans {
 		t.Append([]string{
 			plan.Spec.ExternalName,
 			plan.Spec.Description,

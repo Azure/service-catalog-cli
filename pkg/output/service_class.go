@@ -35,7 +35,7 @@ func AppendClusterServiceClass(table *tablewriter.Table, class *v1beta1.ClusterS
 }
 
 // WriteClusterServiceClassList prints a list of service class to the console.
-func WriteClusterServiceClassList(classes []v1beta1.ClusterServiceClass) {
+func WriteClusterServiceClassList(classes ...v1beta1.ClusterServiceClass) {
 	t := NewListTable()
 	t.SetHeader([]string{
 		"Name",
