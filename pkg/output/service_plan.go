@@ -9,7 +9,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func getPlanStatusText(status v1beta1.ClusterServicePlanStatus) string {
+func getPlanStatusShort(status v1beta1.ClusterServicePlanStatus) string {
 	if status.RemovedFromBrokerCatalog {
 		return statusDeprecated
 	}
@@ -101,7 +101,19 @@ func WriteAssociatedPlans(plans []v1beta1.ClusterServicePlan) {
 	t.Render()
 }
 
-// WritePlanDetails prints a plan to the console.
+// WriteParentPlan prints identifying information for a parent class.
+func WriteParentPlan(plan *v1beta1.ClusterServicePlan) {
+	fmt.Println("\nPlan:")
+	t := NewDetailsTable()
+	t.AppendBulk([][]string{
+		{"Name:", plan.Spec.ExternalName},
+		{"UUID:", string(plan.Name)},
+		{"Status:", getPlanStatusShort(plan.Status)},
+	})
+	t.Render()
+}
+
+// WritePlanDetails prints details for a single plan.
 func WritePlanDetails(plan *v1beta1.ClusterServicePlan, class *v1beta1.ClusterServiceClass) {
 	t := NewDetailsTable()
 
@@ -110,7 +122,7 @@ func WritePlanDetails(plan *v1beta1.ClusterServicePlan, class *v1beta1.ClusterSe
 		{"Description:", plan.Spec.Description},
 		{"UUID:", string(plan.Name)},
 		{"Class:", class.Spec.ExternalName},
-		{"Status:", getPlanStatusText(plan.Status)},
+		{"Status:", getPlanStatusShort(plan.Status)},
 		{"Free:", strconv.FormatBool(plan.Spec.Free)},
 	})
 

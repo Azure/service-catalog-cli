@@ -1,12 +1,9 @@
 package binding
 
 import (
-	"fmt"
-
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type getCmd struct {
@@ -51,17 +48,12 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	bindings, err := c.cl.Servicecatalog().ServiceBindings(c.ns).List(v1.ListOptions{})
+	bindings, err := retrieveAll(c.cl, c.ns)
 	if err != nil {
-		return fmt.Errorf("Error listing bindings (%s)", err)
+		return err
 	}
 
-	t := output.NewTable()
-	output.BindingHeaders(t)
-	for _, binding := range bindings.Items {
-		output.AppendBinding(t, &binding)
-	}
-	t.Render()
+	output.WriteBindingList(bindings.Items...)
 	return nil
 }
 
@@ -71,10 +63,6 @@ func (c *getCmd) get(name string) error {
 		return err
 	}
 
-	t := output.NewTable()
-	output.BindingHeaders(t)
-	output.AppendBinding(t, binding)
-	t.Render()
-
+	output.WriteBindingList(*binding)
 	return nil
 }

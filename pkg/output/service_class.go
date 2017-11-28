@@ -1,6 +1,7 @@
 package output
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
@@ -34,7 +35,7 @@ func AppendClusterServiceClass(table *tablewriter.Table, class *v1beta1.ClusterS
 	})
 }
 
-// WriteClusterServiceClassList prints a list of service class to the console.
+// WriteClusterServiceClassList prints a list of classes.
 func WriteClusterServiceClassList(classes ...v1beta1.ClusterServiceClass) {
 	t := NewListTable()
 	t.SetHeader([]string{
@@ -52,7 +53,19 @@ func WriteClusterServiceClassList(classes ...v1beta1.ClusterServiceClass) {
 	t.Render()
 }
 
-// WriteClusterServiceClass prints a service class to the console.
+// WriteParentClass prints identifying information for a parent class.
+func WriteParentClass(class *v1beta1.ClusterServiceClass) {
+	fmt.Println("\nClass:")
+	t := NewDetailsTable()
+	t.AppendBulk([][]string{
+		{"Name:", class.Spec.ExternalName},
+		{"UUID:", string(class.Name)},
+		{"Status:", getClassStatusText(class.Status)},
+	})
+	t.Render()
+}
+
+// WriteClusterServiceClass prints details for a single class.
 func WriteClusterServiceClass(class *v1beta1.ClusterServiceClass) {
 	t := NewDetailsTable()
 	t.AppendBulk([][]string{

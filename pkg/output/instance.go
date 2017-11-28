@@ -7,12 +7,21 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func getInstanceStatusText(status v1beta1.ServiceInstanceStatus) string {
+func getInstanceStatusCondition(status v1beta1.ServiceInstanceStatus) v1beta1.ServiceInstanceCondition {
 	if len(status.Conditions) > 0 {
-		lastCond := status.Conditions[len(status.Conditions)-1]
-		return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+		return status.Conditions[len(status.Conditions)-1]
 	}
-	return statusNone
+	return v1beta1.ServiceInstanceCondition{}
+}
+
+func getInstanceStatusFull(status v1beta1.ServiceInstanceStatus) string {
+	lastCond := getInstanceStatusCondition(status)
+	return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+}
+
+func getInstanceStatusShort(status v1beta1.ServiceInstanceStatus) string {
+	lastCond := getInstanceStatusCondition(status)
+	return string(lastCond.Type)
 }
 
 // InstanceHeaders sets the appropriate headers on t for displaying ServiceInstances
@@ -45,6 +54,18 @@ func AppendInstance(t *tablewriter.Table, instance *v1beta1.ServiceInstance) {
 	})
 }
 
+// WriteParentInstance prints identifying information for a parent instance.
+func WriteParentInstance(instance *v1beta1.ServiceInstance) {
+	fmt.Println("\nInstance:")
+	t := NewDetailsTable()
+	t.AppendBulk([][]string{
+		{"Name:", instance.Name},
+		{"Namespace:", instance.Namespace},
+		{"Status:", getInstanceStatusShort(instance.Status)},
+	})
+	t.Render()
+}
+
 // WriteAssociatedInstances prints a list of instances associated with a service plan.
 func WriteAssociatedInstances(instances *v1beta1.ServiceInstanceList) {
 	fmt.Println("\nInstances:")
@@ -63,7 +84,7 @@ func WriteAssociatedInstances(instances *v1beta1.ServiceInstanceList) {
 		t.Append([]string{
 			instance.Name,
 			instance.Namespace,
-			getInstanceStatusText(instance.Status),
+			getInstanceStatusFull(instance.Status),
 		})
 	}
 	t.Render()
@@ -76,7 +97,7 @@ func WriteInstanceDetails(instance *v1beta1.ServiceInstance) {
 	t.AppendBulk([][]string{
 		{"Name:", instance.Name},
 		{"Namespace:", instance.Namespace},
-		{"Status:", getInstanceStatusText(instance.Status)},
+		{"Status:", getInstanceStatusFull(instance.Status)},
 		{"Class:", instance.Spec.ClusterServiceClassExternalName},
 		{"Plan:", instance.Spec.ClusterServicePlanExternalName},
 	})

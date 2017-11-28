@@ -1,16 +1,27 @@
 package output
 
 import (
+	"fmt"
+
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/olekukonko/tablewriter"
 )
 
-func getBrokerStatusText(status v1beta1.ClusterServiceBrokerStatus) string {
+func getBrokerStatusCondition(status v1beta1.ClusterServiceBrokerStatus) v1beta1.ServiceBrokerCondition {
 	if len(status.Conditions) > 0 {
-		lastCond := status.Conditions[len(status.Conditions)-1]
-		return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+		return status.Conditions[len(status.Conditions)-1]
 	}
-	return statusNone
+	return v1beta1.ServiceBrokerCondition{}
+}
+
+func getBrokerStatusShort(status v1beta1.ClusterServiceBrokerStatus) string {
+	lastCond := getBrokerStatusCondition(status)
+	return string(lastCond.Type)
+}
+
+func getBrokerStatusFull(status v1beta1.ClusterServiceBrokerStatus) string {
+	lastCond := getBrokerStatusCondition(status)
+	return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
 }
 
 // ClusterServiceBrokerHeaders sets the appropriate headers on t for displaying
@@ -51,14 +62,25 @@ func AppendClusterServiceBroker(t *tablewriter.Table, broker *v1beta1.ClusterSer
 	})
 }
 
-// WriteBrokerDetails prints a broker to the console.
+// WriteParentBroker prints identifying information for a parent broker.
+func WriteParentBroker(broker *v1beta1.ClusterServiceBroker) {
+	fmt.Println("\nBroker:")
+	t := NewDetailsTable()
+	t.AppendBulk([][]string{
+		{"Name:", broker.Name},
+		{"Status:", getBrokerStatusShort(broker.Status)},
+	})
+	t.Render()
+}
+
+// WriteBrokerDetails prints details for a single broker.
 func WriteBrokerDetails(broker *v1beta1.ClusterServiceBroker) {
 	t := NewDetailsTable()
 
 	t.AppendBulk([][]string{
 		{"Name:", broker.Name},
 		{"URL:", broker.Spec.URL},
-		{"Status:", getBrokerStatusText(broker.Status)},
+		{"Status:", getBrokerStatusFull(broker.Status)},
 	})
 
 	t.Render()
