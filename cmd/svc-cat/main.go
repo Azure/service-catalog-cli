@@ -43,6 +43,7 @@ func main() {
 	}
 
 	cmd.AddCommand(newGetCmd(cl))
+	cmd.AddCommand(newDescribeCmd(cl))
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
@@ -59,6 +60,20 @@ func newGetCmd(cl *clientset.Clientset) *cobra.Command {
 	cmd.AddCommand(class.NewGetCmd(cl))
 	cmd.AddCommand(instance.NewGetCmd(cl))
 	cmd.AddCommand(plan.NewGetCmd(cl))
+
+	return cmd
+}
+
+func newDescribeCmd(cl *clientset.Clientset) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "describe",
+		Short: "Show details of a specific resource",
+	}
+	cmd.AddCommand(binding.NewDescribeCmd(cl))
+	cmd.AddCommand(broker.NewDescribeCmd(cl))
+	cmd.AddCommand(class.NewDescribeCmd(cl))
+	cmd.AddCommand(instance.NewDescribeCmd(cl))
+	cmd.AddCommand(plan.NewDescribeCmd(cl))
 
 	return cmd
 }

@@ -69,10 +69,11 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get(name string) error {
-	broker, err := c.cl.Servicecatalog().ClusterServiceBrokers().Get(name, v1.GetOptions{})
+	broker, err := retrieveByName(c.cl, name)
 	if err != nil {
-		return fmt.Errorf("Error getting broker (%s)", err)
+		return err
 	}
+
 	logger.Printf("Broker URL: %s", broker.Spec.URL)
 	t := output.NewTable()
 	t.SetCaption(true, fmt.Sprintf("%d status condition(s)", len(broker.Status.Conditions)))

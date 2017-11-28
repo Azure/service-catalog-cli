@@ -8,8 +8,9 @@ import (
 )
 
 func getInstanceStatusText(status v1beta1.ServiceInstanceStatus) string {
-	if len(status.Conditions) >= 1 {
-		return status.Conditions[len(status.Conditions)-1].Reason
+	if len(status.Conditions) > 0 {
+		lastCond := status.Conditions[len(status.Conditions)-1]
+		return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
 	}
 	return statusNone
 }
@@ -65,5 +66,20 @@ func WriteAssociatedInstances(instances *v1beta1.ServiceInstanceList) {
 			getInstanceStatusText(instance.Status),
 		})
 	}
+	t.Render()
+}
+
+// WriteInstanceDetails prints an instance.
+func WriteInstanceDetails(instance *v1beta1.ServiceInstance) {
+	t := NewDetailsTable()
+
+	t.AppendBulk([][]string{
+		{"Name:", instance.Name},
+		{"Namespace:", instance.Namespace},
+		{"Status:", getInstanceStatusText(instance.Status)},
+		{"Class:", instance.Spec.ClusterServiceClassExternalName},
+		{"Plan:", instance.Spec.ClusterServicePlanExternalName},
+	})
+
 	t.Render()
 }

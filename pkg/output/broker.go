@@ -5,6 +5,14 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
+func getBrokerStatusText(status v1beta1.ClusterServiceBrokerStatus) string {
+	if len(status.Conditions) > 0 {
+		lastCond := status.Conditions[len(status.Conditions)-1]
+		return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+	}
+	return statusNone
+}
+
 // ClusterServiceBrokerHeaders sets the appropriate headers on t for displaying
 // ClusterServiceBrokers in t
 func ClusterServiceBrokerHeaders(t *tablewriter.Table) {
@@ -41,4 +49,17 @@ func AppendClusterServiceBroker(t *tablewriter.Table, broker *v1beta1.ClusterSer
 		condReason,
 		condMessage,
 	})
+}
+
+// WriteBrokerDetails prints a broker to the console.
+func WriteBrokerDetails(broker *v1beta1.ClusterServiceBroker) {
+	t := NewDetailsTable()
+
+	t.AppendBulk([][]string{
+		{"Name:", broker.Name},
+		{"URL:", broker.Spec.URL},
+		{"Status:", getBrokerStatusText(broker.Status)},
+	})
+
+	t.Render()
 }
