@@ -21,8 +21,8 @@ type describeCmd struct {
 func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	describeCmd := &describeCmd{cl: cl}
 	cmd := &cobra.Command{
-		Use:     "classes NAME",
-		Aliases: []string{"class", "cl"},
+		Use:     "class NAME",
+		Aliases: []string{"classes", "cl"},
 		Short:   "Show details of a specific class",
 		Example: `
   svc-cat describe class azure-mysqldb

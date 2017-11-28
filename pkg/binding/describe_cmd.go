@@ -19,8 +19,8 @@ type describeCmd struct {
 func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	describeCmd := &describeCmd{cl: cl}
 	cmd := &cobra.Command{
-		Use:     "bindings NAME",
-		Aliases: []string{"binding", "bnd"},
+		Use:     "binding NAME",
+		Aliases: []string{"bindings", "bnd"},
 		Short:   "Show details of a specific binding",
 		Example: `
   svc-cat describe binding wordpress-mysql-binding

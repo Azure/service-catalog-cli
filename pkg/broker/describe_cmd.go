@@ -18,8 +18,8 @@ type describeCmd struct {
 func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	describeCmd := &describeCmd{cl: cl}
 	cmd := &cobra.Command{
-		Use:     "brokers NAME",
-		Aliases: []string{"broker", "brk"},
+		Use:     "broker NAME",
+		Aliases: []string{"brokers", "brk"},
 		Short:   "Show details of a specific broker",
 		Example: `
   svc-cat describe broker asb

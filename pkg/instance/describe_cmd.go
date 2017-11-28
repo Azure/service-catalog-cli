@@ -19,8 +19,8 @@ type describeCmd struct {
 func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	describeCmd := &describeCmd{cl: cl}
 	cmd := &cobra.Command{
-		Use:     "instances NAME",
-		Aliases: []string{"instance", "inst"},
+		Use:     "instance NAME",
+		Aliases: []string{"instances", "inst"},
 		Short:   "Show details of a specific instance",
 		Example: `
   svc-cat describe instance wordpress-mysql-instance
