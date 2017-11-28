@@ -17,13 +17,13 @@ of the commands that `svc-cat` offers.
 To list all the brokers in the cluster:
 
 ```console
-svc-cat broker list
+svc-cat get brokers
 ```
 
 To get the status of an individual broker:
 
 ```console
-svc-cat broker get <broker name>
+svc-cat get broker <broker name>
 ```
 
 # Commands for `ClusterServiceClass`es
@@ -31,14 +31,23 @@ svc-cat broker get <broker name>
 To get a list of all the `ClusterServiceClass`es in the cluster (i.e. the catalog):
 
 ```console
-svc-cat catalog list
+svc-cat get classes
 ```
+
+# Commands for `ClusterServicePlan`s
+
+To get a list of all the `ClusterServicePlan`s in the cluster (i.e. the catalog):
+
+```console
+svc-cat get plans
+```
+
 # Commands for `ServiceInstance`s
 
 To get a list of all the `ServiceInstance`s in a namespace:
 
 ```console
-svc-cat instance list -n <namespace>
+svc-cat get instances -n <namespace>
 ```
 
 # Commands for `ServiceBinding`s
@@ -46,7 +55,7 @@ svc-cat instance list -n <namespace>
 To get a list of all the `ServiceBinding`s in a namespace:
 
 ```console
-svc-cat binding list -n <namespace>
+svc-cat get bindings -n <namespace>
 ```
 
 # Contributing

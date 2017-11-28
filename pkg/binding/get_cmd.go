@@ -10,14 +10,72 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type bindingGetCmd struct {
+type getCmd struct {
 	cl       *clientset.Clientset
 	ns       string
 	traverse bool
 }
 
-func (b *bindingGetCmd) run(name string) error {
-	binding, err := b.cl.Servicecatalog().ServiceBindings(b.ns).Get(name, v1.GetOptions{})
+// NewGetCmd builds a "svc-cat get bindings" command
+func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
+	getCmd := getCmd{cl: cl}
+	cmd := &cobra.Command{
+		Use:     "bindings [name]",
+		Aliases: []string{"binding", "bnd"},
+		Short:   "List bindings, optionally filtered by name",
+		Example: `
+  svc-cat get bindings
+  svc-cat get binding wordpress-mysql-binding
+  svc-cat get binding -n ci concourse-postgres-binding
+`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return getCmd.run(args)
+		},
+	}
+
+	cmd.Flags().StringVarP(
+		&getCmd.ns,
+		"namespace",
+		"n",
+		"default",
+		"The namespace from which to get the bindings",
+	)
+	cmd.Flags().BoolVarP(
+		&getCmd.traverse,
+		"traverse",
+		"t",
+		false,
+		"Whether or not to traverse from binding -> instance -> service class/service plan -> broker",
+	)
+	return cmd
+}
+
+func (c *getCmd) run(args []string) error {
+	if len(args) == 0 {
+		return c.getAll()
+	} else {
+		name := args[0]
+		return c.get(name)
+	}
+}
+
+func (c *getCmd) getAll() error {
+	bindings, err := c.cl.Servicecatalog().ServiceBindings(c.ns).List(v1.ListOptions{})
+	if err != nil {
+		return fmt.Errorf("Error listing bindings (%s)", err)
+	}
+
+	t := output.NewTable()
+	output.BindingHeaders(t)
+	for _, binding := range bindings.Items {
+		output.AppendBinding(t, &binding)
+	}
+	t.Render()
+	return nil
+}
+
+func (c *getCmd) get(name string) error {
+	binding, err := c.cl.Servicecatalog().ServiceBindings(c.ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("Error getting binding (%s)", err)
 	}
@@ -26,12 +84,12 @@ func (b *bindingGetCmd) run(name string) error {
 	output.AppendBinding(t, binding)
 	t.Render()
 
-	if !b.traverse {
+	if !c.traverse {
 		return nil
 	}
 
 	// Traverse from binding to instance
-	inst, err := traverse.BindingToInstance(b.cl, binding)
+	inst, err := traverse.BindingToInstance(c.cl, binding)
 	if err != nil {
 		return fmt.Errorf("Error traversing binding to its instance (%s)", err)
 	}
@@ -42,7 +100,7 @@ func (b *bindingGetCmd) run(name string) error {
 	t.Render()
 
 	// Traverse from instance to service class and plan
-	class, plan, err := traverse.InstanceToServiceClassAndPlan(b.cl, inst)
+	class, plan, err := traverse.InstanceToServiceClassAndPlan(c.cl, inst)
 	if err != nil {
 		return fmt.Errorf("Error traversing instance to its service class and plan (%s)", err)
 	}
@@ -59,7 +117,7 @@ func (b *bindingGetCmd) run(name string) error {
 	t.Render()
 
 	// traverse from service class to broker
-	broker, err := traverse.ServiceClassToBroker(b.cl, class)
+	broker, err := traverse.ServiceClassToBroker(c.cl, class)
 	if err != nil {
 		return fmt.Errorf("Error traversing service class to broker (%s)", err)
 	}
@@ -70,36 +128,4 @@ func (b *bindingGetCmd) run(name string) error {
 	t.Render()
 
 	return nil
-}
-
-func newBindingGetCmd(cl *clientset.Clientset) *cobra.Command {
-	getCmd := bindingGetCmd{cl: cl}
-	rootCmd := &cobra.Command{
-		Use:   "get",
-		Short: "svc-cat binding get -n <namespace> <binding name>",
-		Long:  "Get a specific binding along with the instance that it points to",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 {
-				return fmt.Errorf("Missing binding name")
-			}
-			bindingName := args[0]
-			return getCmd.run(bindingName)
-		},
-	}
-
-	rootCmd.Flags().StringVarP(
-		&getCmd.ns,
-		"namespace",
-		"n",
-		"default",
-		"The namespace from which to get the binding",
-	)
-	rootCmd.Flags().BoolVarP(
-		&getCmd.traverse,
-		"traverse",
-		"t",
-		false,
-		"Whether or not to traverse from binding -> instance -> service class/service plan -> broker",
-	)
-	return rootCmd
 }
