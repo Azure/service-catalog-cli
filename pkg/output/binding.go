@@ -2,48 +2,55 @@ package output
 
 import (
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/olekukonko/tablewriter"
 )
 
-func getBindingStatusText(status v1beta1.ServiceBindingStatus) string {
+func getBindingStatusCondition(status v1beta1.ServiceBindingStatus) v1beta1.ServiceBindingCondition {
 	if len(status.Conditions) > 0 {
-		lastCond := status.Conditions[len(status.Conditions)-1]
-		return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+		return status.Conditions[len(status.Conditions)-1]
 	}
-	return statusNone
+	return v1beta1.ServiceBindingCondition{}
 }
 
-// BindingHeaders sets the headers for listing bindings in t
-func BindingHeaders(t *tablewriter.Table) {
+func getBindingStatusShort(status v1beta1.ServiceBindingStatus) string {
+	lastCond := getBindingStatusCondition(status)
+	return string(lastCond.Type)
+}
+
+func getBindingStatusFull(status v1beta1.ServiceBindingStatus) string {
+	lastCond := getBindingStatusCondition(status)
+	return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+}
+
+// WriteBindingDetails prints a list of bindings.
+func WriteBindingList(bindings ...v1beta1.ServiceBinding) {
+	t := NewListTable()
 	t.SetHeader([]string{
 		"Name",
-		"Service Instance Name",
+		"Namespace",
+		"Instance",
 		"Status",
 	})
-}
 
-// AppendBinding appends binding to t by calling t.Append.
-// Ensure that you've called BindingHeaders on t before you call AppendBinding
-func AppendBinding(t *tablewriter.Table, binding *v1beta1.ServiceBinding) {
-	lastCond := ""
-	if len(binding.Status.Conditions) > 0 {
-		lastCond = binding.Status.Conditions[len(binding.Status.Conditions)-1].Reason
+	for _, binding := range bindings {
+		t.Append([]string{
+			binding.Name,
+			binding.Namespace,
+			binding.Spec.ServiceInstanceRef.Name,
+			getBindingStatusShort(binding.Status),
+		})
 	}
-	t.Append([]string{
-		binding.Name,
-		binding.Spec.ServiceInstanceRef.Name,
-		lastCond,
-	})
+
+	t.Render()
 }
 
-// WriteBindingDetails prints a binding.
+// WriteBindingDetails prints details for a single binding.
 func WriteBindingDetails(binding *v1beta1.ServiceBinding) {
 	t := NewDetailsTable()
 
 	t.AppendBulk([][]string{
 		{"Name:", binding.Name},
 		{"Namespace:", binding.Namespace},
-		{"Status:", getBindingStatusText(binding.Status)},
+		{"Status:", getBindingStatusFull(binding.Status)},
 		{"Instance:", binding.Spec.ServiceInstanceRef.Name},
 	})
 

@@ -63,37 +63,15 @@ func (c *describeCmd) describe(name string) error {
 
 	output.WriteInstanceDetails(instance)
 
-	if !c.traverse {
-		return nil
+	if c.traverse {
+		class, plan, broker, err := traverse.InstanceParentHierarchy(c.cl, instance)
+		if err != nil {
+			return fmt.Errorf("unable to traverse up the instance hierarchy (%s)", err)
+		}
+		output.WriteParentClass(class)
+		output.WriteParentPlan(plan)
+		output.WriteParentBroker(broker)
 	}
-
-	// Traverse from instance to service class and plan
-	class, plan, err := traverse.InstanceToServiceClassAndPlan(c.cl, instance)
-	if err != nil {
-		return fmt.Errorf("Error traversing instance to its service class and plan (%s)", err)
-	}
-	logger.Printf("\n\nSERVICE CLASS")
-	t := output.NewTable()
-	output.ClusterServiceClassHeaders(t)
-	output.AppendClusterServiceClass(t, class)
-	t.Render()
-
-	logger.Printf("\n\nSERVICE PLAN")
-	t = output.NewTable()
-	output.ClusterServicePlanHeaders(t)
-	output.AppendClusterServicePlan(t, plan)
-	t.Render()
-
-	// traverse from service class to broker
-	broker, err := traverse.ServiceClassToBroker(c.cl, class)
-	if err != nil {
-		return fmt.Errorf("Error traversing service class to broker (%s)", err)
-	}
-	logger.Printf("\n\nBROKER")
-	t = output.NewTable()
-	output.ClusterServiceBrokerHeaders(t)
-	output.AppendClusterServiceBroker(t, broker)
-	t.Render()
 
 	return nil
 }

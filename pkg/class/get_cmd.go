@@ -55,11 +55,8 @@ func (c *getCmd) getAll() error {
 	if err != nil {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
-	if len(classes.Items) == 0 {
-		return fmt.Errorf("the catalog is empty")
-	}
 
-	output.WriteClusterServiceClassList(classes.Items...)
+	output.WriteClassList(classes.Items...)
 	return nil
 }
 
@@ -75,6 +72,6 @@ func (c *getCmd) get(key string) error {
 		return err
 	}
 
-	output.WriteClusterServiceClassList(*class)
+	output.WriteClassList(*class)
 	return nil
 }
