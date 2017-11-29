@@ -9,10 +9,42 @@ resources.
 The goal of the CLI is to provide an easy user interface for Service Catalog users
 to inspect and modify the state of the resources in the system.
 
+# Install
+
+## Bash
+```bash
+curl -sLO https://servicecatalogcli.blob.core.windows.net/cli/latest/$(uname -s)/$(uname -m)/svc-cat
+chmod +x ./svc-cat
+mv ./svc-cat /usr/local/bin/
+svc-cat --version
+```
+
+## Powershell
+
+```powershell
+iwr 'https://servicecatalogcli.blob.core.windows.net/cli/latest/Windows/x86_64/svc-cat.exe' -UseBasicParsing -OutFile svc-cat.exe
+mkdir -f ~\bin
+$env:PATH += ";${pwd}\bin"
+svc-cat --version
+```
+
+The snippet above adds a directory to your PATH for the current session only. 
+You will need to find a permanent location for it and add it to your PATH.
+
+## Manual
+1. Download the appropriate binary for your operating system:
+    * MacOS: https://servicecatalogcli.blob.core.windows.net/cli/latest/Darwin/x86_64/svc-cat
+    * Windows: https://servicecatalogcli.blob.core.windows.net/cli/latest/Windows/x86_64/svc-cat.exe
+    * Linux: https://servicecatalogcli.blob.core.windows.net/cli/latest/Linux/x86_64/svc-cat
+1. Make the binary executable.
+1. Move the binary to a directory on your `PATH`.
+
+# Use
+
 This CLI is called `svc-cat` on the command line. See below for a description 
 of the commands that `svc-cat` offers.
 
-# Commands for `ClusterServiceBroker`s
+## Commands for `ClusterServiceBroker`s
 
 To list all the brokers in the cluster:
 
@@ -26,7 +58,7 @@ To get the status of an individual broker:
 svc-cat get broker <broker name>
 ```
 
-# Commands for `ClusterServiceClass`es
+## Commands for `ClusterServiceClass`es
 
 To get a list of all the `ClusterServiceClass`es in the cluster (i.e. the catalog):
 
@@ -34,7 +66,7 @@ To get a list of all the `ClusterServiceClass`es in the cluster (i.e. the catalo
 svc-cat get classes
 ```
 
-# Commands for `ClusterServicePlan`s
+## Commands for `ClusterServicePlan`s
 
 To get a list of all the `ClusterServicePlan`s in the cluster (i.e. the catalog):
 
@@ -42,7 +74,7 @@ To get a list of all the `ClusterServicePlan`s in the cluster (i.e. the catalog)
 svc-cat get plans
 ```
 
-# Commands for `ServiceInstance`s
+## Commands for `ServiceInstance`s
 
 To get a list of all the `ServiceInstance`s in a namespace:
 
@@ -50,7 +82,7 @@ To get a list of all the `ServiceInstance`s in a namespace:
 svc-cat get instances -n <namespace>
 ```
 
-# Commands for `ServiceBinding`s
+## Commands for `ServiceBinding`s
 
 To get a list of all the `ServiceBinding`s in a namespace:
 
