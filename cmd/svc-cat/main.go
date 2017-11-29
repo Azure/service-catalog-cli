@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Azure/service-catalog-cli/pkg/binding"
@@ -13,12 +14,34 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// These are build-time values, set during an official release
+var (
+	commit  string
+	version string
+)
+
 func main() {
+	// root command context
+	var opts struct {
+		Version bool
+	}
+
 	cmd := &cobra.Command{
 		Use:          "svc-cat",
 		Short:        "The Kubernetes Service-Catalog Command Line Interface (CLI)",
 		SilenceUsage: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if opts.Version {
+				fmt.Printf("svc-cat %s (%s)\n", version, commit)
+				return nil
+			}
+
+			fmt.Print(cmd.UsageString())
+			return nil
+		},
 	}
+
+	cmd.Flags().BoolVarP(&opts.Version, "version", "v", false, "Show the application version")
 
 	flags := cmd.PersistentFlags()
 	kubeConfigLocation := flags.String(
