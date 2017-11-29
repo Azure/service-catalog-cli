@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	statusNone       = ""
 	statusActive     = "Active"
 	statusDeprecated = "Deprecated"
 )
