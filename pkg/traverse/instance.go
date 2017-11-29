@@ -1,6 +1,8 @@
 package traverse
 
 import (
+	"fmt"
+
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -73,4 +75,23 @@ func InstanceParentHierarchy(cl *clientset.Clientset, instance *v1beta1.ServiceI
 	}
 
 	return class, plan, broker, nil
+}
+
+// InstanceToBindings retrieves all child bindings for an instance.
+func InstanceToBindings(cl *clientset.Clientset, instance *v1beta1.ServiceInstance,
+) ([]v1beta1.ServiceBinding, error) {
+	// Not using a filtered list operation because it's not supported yet.
+	results, err := cl.ServicecatalogV1beta1().ServiceBindings(instance.Namespace).List(v1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to search bindings (%s)", err)
+	}
+
+	var bindings []v1beta1.ServiceBinding
+	for _, binding := range results.Items {
+		if binding.Spec.ServiceInstanceRef.Name == instance.Name {
+			bindings = append(bindings, binding)
+		}
+	}
+
+	return bindings, nil
 }
