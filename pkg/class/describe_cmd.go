@@ -70,7 +70,7 @@ func (c *describeCmd) describe(key string) error {
 		return err
 	}
 
-	output.WriteClusterServiceClass(class)
+	output.WriteClassDetails(class)
 
 	if c.traverse {
 		planOpts := v1.ListOptions{

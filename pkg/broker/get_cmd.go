@@ -42,29 +42,12 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	lst, err := c.cl.Servicecatalog().ClusterServiceBrokers().List(v1.ListOptions{})
+	brokers, err := c.cl.ServicecatalogV1beta1().ClusterServiceBrokers().List(v1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("Error listing brokers (%s)", err)
 	}
-	if len(lst.Items) == 0 {
-		logger.Printf("No brokers are installed!")
-		return nil
-	}
-	table := output.NewTable()
-	table.SetHeader([]string{"Name", "URL", "Status"})
-	for _, broker := range lst.Items {
-		latestCond := "None"
-		if len(broker.Status.Conditions) >= 1 {
-			latestCond = broker.Status.Conditions[len(broker.Status.Conditions)-1].Reason
-		}
-		table.Append([]string{
-			broker.Name,
-			broker.Spec.URL,
-			latestCond,
-		})
-	}
-	table.Render()
 
+	output.WriteBrokerList(brokers.Items...)
 	return nil
 }
 
@@ -74,11 +57,6 @@ func (c *getCmd) get(name string) error {
 		return err
 	}
 
-	logger.Printf("Broker URL: %s", broker.Spec.URL)
-	t := output.NewTable()
-	t.SetCaption(true, fmt.Sprintf("%d status condition(s)", len(broker.Status.Conditions)))
-	output.ClusterServiceBrokerHeaders(t)
-	output.AppendClusterServiceBroker(t, broker)
-	t.Render()
+	output.WriteBrokerList(*broker)
 	return nil
 }
