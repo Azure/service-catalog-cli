@@ -7,9 +7,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Dependencies
-          command: make dependencies
-      - run:
           name: Run Build
           command: make build
   test:
@@ -19,9 +16,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install Dependencies
-          command: make dependencies
-      - run:
           name: Run Tests
           command: make test
   deploy:
@@ -30,9 +24,6 @@ jobs:
       - image: quay.io/deis/go-dev:v1.2.0
     steps:
       - checkout
-      - run:
-          name: Install Dependencies
-          command: make dependencies
       - run:
           name: Deploy
           command: make deploy
