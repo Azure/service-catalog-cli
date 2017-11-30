@@ -75,9 +75,11 @@ workflows:
               only: master
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
-      - deploy:
+      - deploy: # Only deploy tagged releases
           requires:
             - test
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/
