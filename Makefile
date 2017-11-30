@@ -6,9 +6,6 @@ LDFLAGS = -w -X main.commit=$(COMMIT) -X main.version=$(VERSION)
 XBUILD = go build -a -tags netgo -ldflags '$(LDFLAGS)'
 RELEASE_DIR = bin/$(VERSION)
 
-dependencies:
-	glide install --strip-vendor
-
 build:
 	go build -o bin/svc-cat ./cmd/svc-cat
 
