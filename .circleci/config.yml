@@ -65,6 +65,18 @@ workflows:
           filters:
             branches:
               only: master
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+  build-and-test-tags:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
       - test:
@@ -72,14 +84,14 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              ignore: /.*/
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
       - deploy: # Only deploy tagged releases
           requires:
             - test
           filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)*/
             branches:
               ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
