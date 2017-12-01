@@ -50,7 +50,10 @@ func main() {
 	// adds the appropriate persistent flags, parses them, and negotiates values based on existing environment variables
 	vars := environment.New(os.Args, flags)
 
-	_, cl, _ := getKubeClient(vars)
+	_, cl, err := getKubeClient(vars)
+	if err != nil {
+		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
+	}
 
 	cmd.AddCommand(newGetCmd(cl))
 	cmd.AddCommand(newDescribeCmd(cl))
@@ -77,11 +80,7 @@ func getKubeClient(vars environment.EnvSettings) (*rest.Config, *clientset.Clien
 		logger.Fatalf("Error getting Kubernetes configuration (%s)", err)
 	}
 	client, err := clientset.NewForConfig(config)
-	if err != nil {
-		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
-	}
-
-	return nil, client, nil
+	return nil, client, err
 }
 
 func newSyncCmd(cl *clientset.Clientset) *cobra.Command {
