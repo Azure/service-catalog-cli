@@ -10,19 +10,19 @@ dependencies:
 	glide install --strip-vendor
 
 build:
-	go build -o bin/svc-cat ./cmd/svc-cat
+	go build -o bin/svcat ./cmd/svcat
 
 linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(XBUILD) -o $(RELEASE_DIR)/Linux/x86_64/svc-cat ./cmd/svc-cat
-	cd $(RELEASE_DIR)/Linux/x86_64 && shasum -a 256 svc-cat > svc-cat.sha256
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(XBUILD) -o $(RELEASE_DIR)/Linux/x86_64/svcat ./cmd/svcat
+	cd $(RELEASE_DIR)/Linux/x86_64 && shasum -a 256 svcat > svcat.sha256
 
 darwin:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(XBUILD) -o $(RELEASE_DIR)/Darwin/x86_64/svc-cat ./cmd/svc-cat
-	cd $(RELEASE_DIR)/Darwin/x86_64 && shasum -a 256 svc-cat > svc-cat.sha256
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(XBUILD) -o $(RELEASE_DIR)/Darwin/x86_64/svcat ./cmd/svcat
+	cd $(RELEASE_DIR)/Darwin/x86_64 && shasum -a 256 svcat > svcat.sha256
 
 windows:
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(XBUILD) -o $(RELEASE_DIR)/Windows/x86_64/svc-cat.exe ./cmd/svc-cat
-	cd $(RELEASE_DIR)/Windows/x86_64 && shasum -a 256 svc-cat.exe > svc-cat.exe.sha256
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(XBUILD) -o $(RELEASE_DIR)/Windows/x86_64/svcat.exe ./cmd/svcat
+	cd $(RELEASE_DIR)/Windows/x86_64 && shasum -a 256 svcat.exe > svcat.exe.sha256
 
 cross-build: linux darwin windows
 

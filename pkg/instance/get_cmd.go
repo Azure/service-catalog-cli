@@ -11,7 +11,7 @@ type getCmd struct {
 	ns string
 }
 
-// NewGetCmd builds a "svc-cat get instances" command
+// NewGetCmd builds a "svcat get instances" command
 func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 	getCmd := &getCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -19,9 +19,9 @@ func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"instance", "inst"},
 		Short:   "List instances, optionally filtered by name",
 		Example: `
-  svc-cat get instances
-  svc-cat get instance wordpress-mysql-instance
-  svc-cat get instance -n ci concourse-postgres-instance
+  svcat get instances
+  svcat get instance wordpress-mysql-instance
+  svcat get instance -n ci concourse-postgres-instance
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return getCmd.run(args)

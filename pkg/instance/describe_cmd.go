@@ -15,7 +15,7 @@ type describeCmd struct {
 	traverse bool
 }
 
-// NewDescribeCmd builds a "svc-cat describe instance" command
+// NewDescribeCmd builds a "svcat describe instance" command
 func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	describeCmd := &describeCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -23,7 +23,7 @@ func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"instances", "inst"},
 		Short:   "Show details of a specific instance",
 		Example: `
-  svc-cat describe instance wordpress-mysql-instance
+  svcat describe instance wordpress-mysql-instance
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return describeCmd.run(args)

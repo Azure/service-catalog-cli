@@ -15,7 +15,7 @@ type getCmd struct {
 	lookupByUUID bool
 }
 
-// NewGetCmd builds a "svc-cat get classes" command
+// NewGetCmd builds a "svcat get classes" command
 func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 	getCmd := &getCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -23,9 +23,9 @@ func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"class", "cl"},
 		Short:   "List classes, optionally filtered by name",
 		Example: `
-  svc-cat get classes
-  svc-cat get class azure-mysqldb
-  svc-cat get class --uuid 997b8372-8dac-40ac-ae65-758b4a5075a5
+  svcat get classes
+  svcat get class azure-mysqldb
+  svcat get class --uuid 997b8372-8dac-40ac-ae65-758b4a5075a5
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return getCmd.run(args)

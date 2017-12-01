@@ -15,7 +15,7 @@ type getCmd struct {
 	lookupByUUID bool
 }
 
-// NewGetCmd builds a "svc-cat get plans" command
+// NewGetCmd builds a "svcat get plans" command
 func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 	getCmd := &getCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -23,9 +23,9 @@ func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"plan", "pl"},
 		Short:   "List plans, optionally filtered by name",
 		Example: `
-  svc-cat get plans
-  svc-cat get plan standard800
-  svc-cat get plan --uuid 08e4b43a-36bc-447e-a81f-8202b13e339c
+  svcat get plans
+  svcat get plan standard800
+  svcat get plan --uuid 08e4b43a-36bc-447e-a81f-8202b13e339c
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return getCmd.run(args)

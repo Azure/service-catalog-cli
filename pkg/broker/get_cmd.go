@@ -13,7 +13,7 @@ type getCmd struct {
 	cl *clientset.Clientset
 }
 
-// NewGetCmd builds a "svc-cat get brokers" command
+// NewGetCmd builds a "svcat get brokers" command
 func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 	getCmd := getCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -21,8 +21,8 @@ func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"broker", "brk"},
 		Short:   "List brokers, optionally filtered by name",
 		Example: `
-  svc-cat get brokers
-  svc-cat get broker asb
+  svcat get brokers
+  svcat get broker asb
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return getCmd.run(args)
