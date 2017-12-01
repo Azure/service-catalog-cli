@@ -13,16 +13,38 @@ type syncCmd struct {
 	cl *clientset.Clientset
 }
 
-func (c *syncCmd) run(name string) error {
-	for j := 0; j < 3; j++ {
-		catalog, err := c.cl.Servicecatalog().ClusterServiceBrokers().Get(name, v1.GetOptions{})
+// NewSyncCmd builds a "svc-cat sync broker" command
+func NewSyncCmd(cl *clientset.Clientset) *cobra.Command {
+	syncCmd := syncCmd{cl: cl}
+	rootCmd := &cobra.Command{
+		Use:   "broker [name]",
+		Short: "Syncs service catalog for a service broker",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return syncCmd.run(args)
+		},
+	}
+	return rootCmd
+}
+
+func (c *syncCmd) run(args []string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("name is required")
+	}
+	name := args[0]
+	return c.sync(name)
+}
+
+func (c *syncCmd) sync(name string) error {
+	const retries = 3
+	for j := 0; j < retries; j++ {
+		catalog, err := c.cl.ServicecatalogV1beta1().ClusterServiceBrokers().Get(name, v1.GetOptions{})
 		if err != nil {
 			logger.Fatalf("Error fetching ClusterServiceBrokers (%s)", err)
 		}
 
 		catalog.Spec.RelistRequests = catalog.Spec.RelistRequests + 1
 
-		_, err = c.cl.Servicecatalog().ClusterServiceBrokers().Update(catalog)
+		_, err = c.cl.ServicecatalogV1beta1().ClusterServiceBrokers().Update(catalog)
 		if err == nil {
 			logger.Printf("Successfully fetched catalog entries from %s broker", name)
 			return nil
@@ -30,25 +52,7 @@ func (c *syncCmd) run(name string) error {
 		if !errors.IsConflict(err) {
 			return err
 		}
-		logger.Printf("Conflict when syncing service broker, retries left: %v", 3-j)
+		logger.Printf("Conflict when syncing service broker, retries left: %v", retries-j)
 	}
 	return fmt.Errorf("Failed to sync service broker")
-}
-
-// NewSyncCmd builds a "svc-cat sync broker" command
-func NewSyncCmd(cl *clientset.Clientset) *cobra.Command {
-	syncCmd := syncCmd{cl: cl}
-	rootCmd := &cobra.Command{
-		Use:   "broker <broker name>",
-		Short: "Syncs service catalog for a service broker",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 {
-				return fmt.Errorf("Missing service broker name")
-			}
-			brokerName := args[0]
-
-			return syncCmd.run(brokerName)
-		},
-	}
-	return rootCmd
 }
