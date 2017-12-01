@@ -67,10 +67,22 @@ func main() {
 
 	cmd.AddCommand(newGetCmd(cl))
 	cmd.AddCommand(newDescribeCmd(cl))
+	cmd.AddCommand(newSyncCmd(cl))
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func newSyncCmd(cl *clientset.Clientset) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "sync",
+		Short:   "Syncs service catalog for a service broker",
+		Aliases: []string{"relist"},
+	}
+	cmd.AddCommand(broker.NewSyncCmd(cl))
+
+	return cmd
 }
 
 func newGetCmd(cl *clientset.Clientset) *cobra.Command {
