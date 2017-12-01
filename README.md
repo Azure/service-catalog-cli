@@ -4,7 +4,10 @@
 
 This project is a command line interface (CLI) for interacting with 
 [Kubernetes Service Catalog](https://github.com/kubernetes-incubator/service-catalog)
-resources.
+resources. Our releases follow [semver](https://semver.org) and the project
+is in **alpha** status. This means that no assurances are made
+about backwards compatibility or stability. Before we hit v1.0.0, breaking changes
+are indicated by bumping the minor version.
 
 The goal of the CLI is to provide an easy user interface for Service Catalog users
 to inspect and modify the state of the resources in the system.
