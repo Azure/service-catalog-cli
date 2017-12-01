@@ -6,7 +6,6 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/binding"
 	"github.com/Azure/service-catalog-cli/pkg/broker"
-	"github.com/Azure/service-catalog-cli/pkg/catalog"
 	"github.com/Azure/service-catalog-cli/pkg/class"
 	"github.com/Azure/service-catalog-cli/pkg/environment"
 	"github.com/Azure/service-catalog-cli/pkg/instance"
@@ -49,16 +48,17 @@ func main() {
 	flags := cmd.PersistentFlags()
 
 	// adds the appropriate persistent flags, parses them, and negotiates values based on existing environment variables
-	vars := environment.New(args, flags)
+	vars := environment.New(os.Args, flags)
 
-	_, client, _ := getKubeClient(vars)
+	_, cl, _ := getKubeClient(vars)
 
-	cmd.AddCommand(broker.NewRootCmd(client))
-	cmd.AddCommand(catalog.NewRootCmd(client))
-	cmd.AddCommand(instance.NewRootCmd(client))
-	cmd.AddCommand(binding.NewRootCmd(client))
+	cmd.AddCommand(newGetCmd(cl))
+	cmd.AddCommand(newDescribeCmd(cl))
+	cmd.AddCommand(newSyncCmd(cl))
 
-	return cmd
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
 
 // configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
@@ -81,18 +81,7 @@ func getKubeClient(vars environment.EnvSettings) (*rest.Config, *clientset.Clien
 		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
 	}
 
-	cmd.AddCommand(newGetCmd(cl))
-	cmd.AddCommand(newDescribeCmd(cl))
-	cmd.AddCommand(newSyncCmd(cl))
-
 	return nil, client, nil
-}
-
-func main() {
-	cmd := newRootCmd(os.Args[1:])
-	if err := cmd.Execute(); err != nil {
-		os.Exit(1)
-	}
 }
 
 func newSyncCmd(cl *clientset.Clientset) *cobra.Command {
