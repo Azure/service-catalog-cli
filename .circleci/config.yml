@@ -84,7 +84,9 @@ workflows:
             - build
           filters:
             branches:
-              ignore: /.*/
+              # this is a hack, because ignore seems to block all PR builds
+              # from completing. We have filed an issue with CircleCI about this
+              only: noexist
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
       - deploy: # Only deploy tagged releases
@@ -92,6 +94,8 @@ workflows:
             - test
           filters:
             branches:
-              ignore: /.*/
+              # this is a hack, because ignore seems to block all PR builds
+              # from completing. We have filed an issue with CircleCI about this
+              only: noexist
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
