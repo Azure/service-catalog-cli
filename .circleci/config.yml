@@ -18,6 +18,15 @@ jobs:
       - run:
           name: Run Tests
           command: make test
+  verify-vendor:
+    working_directory: /go/src/github.com/Azure/service-catalog-cli
+    docker:
+       - image: quay.io/deis/go-dev:v1.2.0
+    steps:
+      - checkout
+      - run:
+          name: Verify vendor/
+          command: make verify-vendor
   deploy:
     working_directory: /go/src/github.com/Azure/service-catalog-cli
     docker:
@@ -27,7 +36,6 @@ jobs:
       - run:
           name: Deploy
           command: make deploy
-
 workflows:
   version: 2
   build-and-test-pr:
@@ -38,6 +46,12 @@ workflows:
             branches:
               ignore: master
       - build:
+          requires:
+            - hold
+          filters:
+            branches:
+              ignore: master
+      - verify-vendor:
           requires:
             - hold
           filters:
@@ -56,6 +70,10 @@ workflows:
           filters:
             branches:
               only: master
+      - verify-vendor:
+          filters:
+            branches:
+              only: master
       - test:
           requires:
             - build
@@ -65,6 +83,12 @@ workflows:
   build-and-test-tags:
     jobs:
       - build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /v[0-9]+(\.[0-9]+)*/
+      - verify-vendor:
           filters:
             branches:
               ignore: /.*/
@@ -82,6 +106,7 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)*/
       - deploy: # Only deploy tagged releases
           requires:
+            - verify-vendor
             - test
           filters:
             branches:
