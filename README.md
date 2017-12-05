@@ -47,7 +47,7 @@ You will need to find a permanent location for it and add it to your PATH.
 This CLI is called `svcat` on the command line. Run `svcat -h` to see the available
 commands.
 
-Below are some common tasks made easy with `svcat`:
+Below are some common tasks made easy with `svcat`. The example output assumes that [Open Service Broker for Azure](https://github.com/Azure/open-service-broker-azure/) is installed on the cluster.
 
 ## Find brokers installed on the cluster
 
