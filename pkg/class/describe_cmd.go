@@ -17,7 +17,7 @@ type describeCmd struct {
 	lookupByUUID bool
 }
 
-// NewDescribeCmd builds a "svc-cat describe class" command
+// NewDescribeCmd builds a "svcat describe class" command
 func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	describeCmd := &describeCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -25,8 +25,8 @@ func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"classes", "cl"},
 		Short:   "Show details of a specific class",
 		Example: `
-  svc-cat describe class azure-mysqldb
-  svc-cat describe class -uuid 997b8372-8dac-40ac-ae65-758b4a5075a5
+  svcat describe class azure-mysqldb
+  svcat describe class -uuid 997b8372-8dac-40ac-ae65-758b4a5075a5
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return describeCmd.run(args)

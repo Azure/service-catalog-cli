@@ -14,7 +14,7 @@ type describeCmd struct {
 	traverse bool
 }
 
-// NewDescribeCmd builds a "svc-cat describe broker" command
+// NewDescribeCmd builds a "svcat describe broker" command
 func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	describeCmd := &describeCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -22,7 +22,7 @@ func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"brokers", "brk"},
 		Short:   "Show details of a specific broker",
 		Example: `
-  svc-cat describe broker asb
+  svcat describe broker asb
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return describeCmd.run(args)

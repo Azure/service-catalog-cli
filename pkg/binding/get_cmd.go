@@ -11,7 +11,7 @@ type getCmd struct {
 	ns string
 }
 
-// NewGetCmd builds a "svc-cat get bindings" command
+// NewGetCmd builds a "svcat get bindings" command
 func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 	getCmd := getCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -19,9 +19,9 @@ func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"binding", "bnd"},
 		Short:   "List bindings, optionally filtered by name",
 		Example: `
-  svc-cat get bindings
-  svc-cat get binding wordpress-mysql-binding
-  svc-cat get binding -n ci concourse-postgres-binding
+  svcat get bindings
+  svcat get binding wordpress-mysql-binding
+  svcat get binding -n ci concourse-postgres-binding
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return getCmd.run(args)

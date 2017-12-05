@@ -17,7 +17,7 @@ type describeCmd struct {
 	lookupByUUID bool
 }
 
-// NewDescribeCmd builds a "svc-cat describe plan" command
+// NewDescribeCmd builds a "svcat describe plan" command
 func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 	describeCmd := &describeCmd{cl: cl}
 	cmd := &cobra.Command{
@@ -25,8 +25,8 @@ func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
 		Aliases: []string{"plans", "pl"},
 		Short:   "Show details of a specific plan",
 		Example: `
-  svc-cat describe plan standard800
-  svc-cat describe plan --uuid 08e4b43a-36bc-447e-a81f-8202b13e339c
+  svcat describe plan standard800
+  svcat describe plan --uuid 08e4b43a-36bc-447e-a81f-8202b13e339c
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return describeCmd.run(args)
