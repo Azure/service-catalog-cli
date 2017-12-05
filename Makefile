@@ -23,6 +23,20 @@ windows:
 
 cross-build: linux darwin windows
 
+check-dep:
+	@if [ -z $$(which dep) ]; then \
+		echo 'Missing `dep` client which is required for development'; \
+		exit 2; \
+	fi
+
+verify-vendor: check-dep
+	dep ensure --vendor-only
+	dep prune
+	@if [ -n "$$(git status --porcelain vendor)" ]; then \
+		echo 'vendor/ is out-of-date: run `dep ensure --vendor-only && dep prune`'; \
+		exit 2; \
+	fi
+
 test:
 	go test $$(glide nv)
 
