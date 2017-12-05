@@ -61,6 +61,12 @@ To get the status of an individual broker:
 svcat get broker <broker name>
 ```
 
+To trigger a sync of an individual broker's catalog:
+
+```console
+svcat sync broker <broker name>
+```
+
 ## Commands for `ClusterServiceClass`es
 
 To get a list of all the `ClusterServiceClass`es in the cluster (i.e. the catalog):
