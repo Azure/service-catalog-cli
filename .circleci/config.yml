@@ -36,7 +36,6 @@ jobs:
       - run:
           name: Deploy
           command: make deploy
-
 workflows:
   version: 2
   build-and-test-pr:
