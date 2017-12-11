@@ -30,7 +30,7 @@ func main() {
 
 	cmd := &cobra.Command{
 		Use:          "svcat",
-		Short:        "The Kubernetes Service Catalog Command Line Interface (CLI)",
+		Short:        "The Kubernetes Service Catalog Command-Line Interface (CLI)",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Version {
