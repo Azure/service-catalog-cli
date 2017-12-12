@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/Azure/service-catalog-cli.svg?style=svg&circle-token=98d6d64c981e70b76736fb3f05a0b41b4fec47cf)](https://circleci.com/gh/Azure/service-catalog-cli)
 
-This project is a command line interface (CLI) for interacting with 
+This project is a command-line interface (CLI) for interacting with 
 [Kubernetes Service Catalog](https://github.com/kubernetes-incubator/service-catalog)
 resources.
 
@@ -22,7 +22,7 @@ mv ./svcat /usr/local/bin/
 svcat --version
 ```
 
-## Powershell
+## PowerShell
 
 ```powershell
 iwr 'https://servicecatalogcli.blob.core.windows.net/cli/latest/Windows/x86_64/svcat.exe' -UseBasicParsing -OutFile svcat.exe
@@ -36,7 +36,7 @@ You will need to find a permanent location for it and add it to your PATH.
 
 ## Manual
 1. Download the appropriate binary for your operating system:
-    * MacOS: https://servicecatalogcli.blob.core.windows.net/cli/latest/Darwin/x86_64/svcat
+    * macOS: https://servicecatalogcli.blob.core.windows.net/cli/latest/Darwin/x86_64/svcat
     * Windows: https://servicecatalogcli.blob.core.windows.net/cli/latest/Windows/x86_64/svcat.exe
     * Linux: https://servicecatalogcli.blob.core.windows.net/cli/latest/Linux/x86_64/svcat
 1. Make the binary executable.
