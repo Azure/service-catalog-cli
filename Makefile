@@ -31,6 +31,15 @@ check-dep:
 		dep version; \
 	fi
 
+get-dep:
+	# Install the latest release of dep
+	go get -d -u github.com/golang/dep
+	cd $$(go env GOPATH)/src/github.com/golang/dep && \
+	DEP_TAG=$$(git describe --abbrev=0 --tags) && \
+	git checkout $$DEP_TAG && \
+	go install -ldflags="-X main.version=$$DEP_TAG" ./cmd/dep; \
+	git checkout master # Make go get happy by switching back to master
+
 verify-vendor: check-dep
 	dep ensure --vendor-only
 	dep prune

@@ -26,7 +26,7 @@ jobs:
       - checkout
       - run:
           name: Verify vendor/
-          command: make verify-vendor
+          command: make get-dep verify-vendor
   deploy:
     working_directory: /go/src/github.com/Azure/service-catalog-cli
     docker:
