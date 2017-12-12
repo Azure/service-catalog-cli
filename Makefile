@@ -45,7 +45,7 @@ verify-vendor: check-dep
 	dep prune
 	@if [ -n "$$(git status --porcelain vendor)" ]; then \
 		echo 'vendor/ is out-of-date: run `dep ensure --vendor-only && dep prune`'; \
-		git status --porcelain vendor \
+		git status --porcelain vendor; \
 		exit 2; \
 	fi
 
