@@ -1,0 +1,7 @@
+[[constraint]]
+  name = "github.com/kubernetes-incubator/service-catalog"
+  version = "~0.1.2"
+
+[[constraint]]
+  name = "k8s.io/client-go"
+  version = "~5.0.1"
