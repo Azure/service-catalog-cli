@@ -77,5 +77,13 @@ func (c *describeCmd) describe(key string) error {
 	}
 	output.WriteAssociatedPlans(plans)
 
+	if c.traverse {
+		broker, err := traverse.ClassToBroker(c.cl, class)
+		if err != nil {
+			return err
+		}
+		output.WriteParentBroker(broker)
+	}
+
 	return nil
 }

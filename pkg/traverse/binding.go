@@ -33,7 +33,7 @@ func BindingParentHierarchy(cl *clientset.Clientset, binding *v1beta1.ServiceBin
 		return nil, nil, nil, nil, err
 	}
 
-	broker, err := ServiceClassToBroker(cl, class)
+	broker, err := ClassToBroker(cl, class)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}

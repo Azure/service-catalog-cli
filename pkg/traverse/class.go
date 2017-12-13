@@ -13,14 +13,13 @@ const (
 	fieldServiceClassRef = "spec.clusterServiceClassRef.name"
 )
 
-// ServiceClassToBroker fetches the ClusterServiceBroker for the given
-// ClusterServiceClass, using cl to do the fetch
-func ServiceClassToBroker(
+// ClassToBroker retrieves the parent broker of a class.
+func ClassToBroker(
 	cl *clientset.Clientset,
 	class *v1beta1.ClusterServiceClass,
 ) (*v1beta1.ClusterServiceBroker, error) {
 	brokerName := class.Spec.ClusterServiceBrokerName
-	broker, err := cl.Servicecatalog().ClusterServiceBrokers().Get(brokerName, v1.GetOptions{})
+	broker, err := cl.ServicecatalogV1beta1().ClusterServiceBrokers().Get(brokerName, v1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}

@@ -69,7 +69,7 @@ func InstanceParentHierarchy(cl *clientset.Clientset, instance *v1beta1.ServiceI
 		return nil, nil, nil, err
 	}
 
-	broker, err := ServiceClassToBroker(cl, class)
+	broker, err := ClassToBroker(cl, class)
 	if err != nil {
 		return nil, nil, nil, err
 	}
