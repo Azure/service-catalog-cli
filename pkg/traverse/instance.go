@@ -8,8 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// InstanceToServiceClassAndPlan fetches the ClusterServiceClass and
-// ClusterServicePlan for instance, using cl to do the fetches
+// InstanceToServiceClassAndPlan retrieves the parent class and plan for an instance.
 func InstanceToServiceClassAndPlan(
 	cl *clientset.Clientset,
 	instance *v1beta1.ServiceInstance,
@@ -18,7 +17,7 @@ func InstanceToServiceClassAndPlan(
 	classCh := make(chan *v1beta1.ClusterServiceClass)
 	classErrCh := make(chan error)
 	go func() {
-		class, err := cl.Servicecatalog().ClusterServiceClasses().Get(classID, v1.GetOptions{})
+		class, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(classID, v1.GetOptions{})
 		if err != nil {
 			classErrCh <- err
 			return
@@ -30,7 +29,7 @@ func InstanceToServiceClassAndPlan(
 	planCh := make(chan *v1beta1.ClusterServicePlan)
 	planErrCh := make(chan error)
 	go func() {
-		plan, err := cl.Servicecatalog().ClusterServicePlans().Get(planID, v1.GetOptions{})
+		plan, err := cl.ServicecatalogV1beta1().ClusterServicePlans().Get(planID, v1.GetOptions{})
 		if err != nil {
 			planErrCh <- err
 			return
