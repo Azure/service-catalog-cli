@@ -55,6 +55,13 @@ Below are some common tasks made easy with `svcat`. The example output assumes t
 $ svcat get brokers
 ```
 
+## Trigger a sync of a broker's catalog
+
+```console
+$ svcat sync broker osba
+Successfully fetched catalog entries from osba broker
+```
+
 ## List available service classes
 
 ```console
