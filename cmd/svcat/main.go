@@ -34,7 +34,11 @@ func main() {
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Version {
-				fmt.Printf("svcat %s (%s)\n", version, commit)
+				if commit == "" { // commit is empty for Homebrew builds
+					fmt.Printf("svcat %s\n", version)
+				} else {
+					fmt.Printf("svcat %s (%s)\n", version, commit)
+				}
 				return nil
 			}
 
