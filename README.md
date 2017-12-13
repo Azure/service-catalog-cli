@@ -53,6 +53,16 @@ Below are some common tasks made easy with `svcat`. The example output assumes t
 
 ```console
 $ svcat get brokers
+  NAME                               URL                                STATUS
++------+--------------------------------------------------------------+--------+
+  osba   http://osba-open-service-broker-azure.osba.svc.cluster.local   Ready
+```
+
+## Trigger a sync of a broker's catalog
+
+```console
+$ svcat sync broker osba
+Successfully fetched catalog entries from osba broker
 ```
 
 ## List available service classes
