@@ -1,0 +1,3 @@
+  NAME                               URL                                STATUS  
++------+--------------------------------------------------------------+--------+
+  blorp   http://osba-open-service-broker-azure.osba.svc.cluster.local   Ready
