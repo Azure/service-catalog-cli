@@ -7,11 +7,13 @@ import (
 	"github.com/Azure/service-catalog-cli/pkg/binding"
 	"github.com/Azure/service-catalog-cli/pkg/broker"
 	"github.com/Azure/service-catalog-cli/pkg/class"
+	"github.com/Azure/service-catalog-cli/pkg/environment"
 	"github.com/Azure/service-catalog-cli/pkg/instance"
 	"github.com/Azure/service-catalog-cli/pkg/kube"
 	"github.com/Azure/service-catalog-cli/pkg/plan"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
+	"k8s.io/client-go/rest"
 )
 
 // These are build-time values, set during an official release
@@ -28,7 +30,7 @@ func main() {
 
 	cmd := &cobra.Command{
 		Use:          "svcat",
-		Short:        "The Kubernetes Service Catalog Command Line Interface (CLI)",
+		Short:        "The Kubernetes Service Catalog Command-Line Interface (CLI)",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Version {
@@ -44,23 +46,11 @@ func main() {
 	cmd.Flags().BoolVarP(&opts.Version, "version", "v", false, "Show the application version")
 
 	flags := cmd.PersistentFlags()
-	kubeConfigLocation := flags.String(
-		"config",
-		kube.DefaultConfigLocation(),
-		"the location of the Kubernetes configuration file",
-	)
-	kubeContext := flags.String(
-		"context",
-		"",
-		"the context to use in the Kubernetes configuration file",
-	)
-	flags.Parse(os.Args)
 
-	cfg, err := kube.ConfigForContext(*kubeConfigLocation, *kubeContext)
-	if err != nil {
-		logger.Fatalf("Error getting Kubernetes configuration (%s)", err)
-	}
-	cl, err := clientset.NewForConfig(cfg)
+	// adds the appropriate persistent flags, parses them, and negotiates values based on existing environment variables
+	vars := environment.New(os.Args, flags)
+
+	_, cl, err := getKubeClient(vars)
 	if err != nil {
 		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
 	}
@@ -72,6 +62,25 @@ func main() {
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+// configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
+func configForContext(vars environment.EnvSettings) (*rest.Config, error) {
+	config, err := kube.GetConfig(vars.KubeContext, vars.KubeConfig).ClientConfig()
+	if err != nil {
+		return nil, fmt.Errorf("could not get Kubernetes config for context %q: %s", vars.KubeContext, err)
+	}
+	return config, nil
+}
+
+// getKubeClient creates a Kubernetes config and client for a given kubeconfig context.
+func getKubeClient(vars environment.EnvSettings) (*rest.Config, *clientset.Clientset, error) {
+	config, err := configForContext(vars)
+	if err != nil {
+		logger.Fatalf("Error getting Kubernetes configuration (%s)", err)
+	}
+	client, err := clientset.NewForConfig(config)
+	return nil, client, err
 }
 
 func newSyncCmd(cl *clientset.Clientset) *cobra.Command {
