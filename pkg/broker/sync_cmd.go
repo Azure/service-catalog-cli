@@ -13,7 +13,7 @@ type syncCmd struct {
 	cl *clientset.Clientset
 }
 
-// NewSyncCmd builds a "svc-cat sync broker" command
+// NewSyncCmd builds a "svcat sync broker" command
 func NewSyncCmd(cl *clientset.Clientset) *cobra.Command {
 	syncCmd := syncCmd{cl: cl}
 	rootCmd := &cobra.Command{

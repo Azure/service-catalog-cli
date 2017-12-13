@@ -6,9 +6,6 @@ LDFLAGS = -w -X main.commit=$(COMMIT) -X main.version=$(VERSION)
 XBUILD = go build -a -tags netgo -ldflags '$(LDFLAGS)'
 RELEASE_DIR = bin/$(VERSION)
 
-dependencies:
-	glide install --strip-vendor
-
 build:
 	go build -o bin/svcat ./cmd/svcat
 
@@ -25,6 +22,32 @@ windows:
 	cd $(RELEASE_DIR)/Windows/x86_64 && shasum -a 256 svcat.exe > svcat.exe.sha256
 
 cross-build: linux darwin windows
+
+check-dep:
+	@if [ -z "$$(which dep)" ]; then \
+		echo 'Missing `dep` client which is required for development'; \
+		exit 2; \
+	else \
+		dep version; \
+	fi
+
+get-dep:
+	# Install the latest release of dep
+	go get -d -u github.com/golang/dep
+	cd $$(go env GOPATH)/src/github.com/golang/dep && \
+	DEP_TAG=$$(git describe --abbrev=0 --tags) && \
+	git checkout $$DEP_TAG && \
+	go install -ldflags="-X main.version=$$DEP_TAG" ./cmd/dep; \
+	git checkout master # Make go get happy by switching back to master
+
+verify-vendor: check-dep
+	dep ensure --vendor-only
+	dep prune
+	@if [ -n "$$(git status --porcelain vendor)" ]; then \
+		echo 'vendor/ is out-of-date: run `dep ensure --vendor-only && dep prune`'; \
+		git status --porcelain vendor; \
+		exit 2; \
+	fi
 
 test:
 	go test $$(glide nv)
