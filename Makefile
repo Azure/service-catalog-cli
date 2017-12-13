@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
-COMMIT = $(shell git rev-parse --verify --short HEAD)
-VERSION = $(shell git describe --tags --dirty='+dev' 2> /dev/null)
+COMMIT ?= $(shell git rev-parse --verify --short HEAD)
+VERSION ?= $(shell git describe --tags --dirty='+dev' 2> /dev/null)
 LDFLAGS = -w -X main.commit=$(COMMIT) -X main.version=$(VERSION)
 XBUILD = go build -a -tags netgo -ldflags '$(LDFLAGS)'
 RELEASE_DIR = bin/$(VERSION)
