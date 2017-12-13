@@ -8,7 +8,6 @@ import (
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type describeCmd struct {
@@ -71,9 +70,9 @@ func (c *describeCmd) describe(key string) error {
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := c.cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
+	class, err := traverse.PlanToClass(c.cl, plan)
 	if err != nil {
-		return fmt.Errorf("unable to get class (%s)", err)
+		return err
 	}
 
 	output.WritePlanDetails(plan, class)
@@ -83,6 +82,15 @@ func (c *describeCmd) describe(key string) error {
 		return err
 	}
 	output.WriteAssociatedInstances(instances)
+
+	if c.traverse {
+		broker, err := traverse.ClassToBroker(c.cl, class)
+		if err != nil {
+			return err
+		}
+		output.WriteParentClass(class)
+		output.WriteParentBroker(broker)
+	}
 
 	return nil
 }
