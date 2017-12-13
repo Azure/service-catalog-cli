@@ -23,6 +23,13 @@ var (
 )
 
 func main() {
+	cmd := buildRootCommand()
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func buildRootCommand() *cobra.Command {
 	// root command context
 	var opts struct {
 		Version bool
@@ -63,9 +70,7 @@ func main() {
 	cmd.AddCommand(newDescribeCmd(cl))
 	cmd.AddCommand(newSyncCmd(cl))
 
-	if err := cmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+	return cmd
 }
 
 // configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
