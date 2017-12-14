@@ -4,6 +4,20 @@ The Service Catalog CLI project accepts contributions via GitHub pull
 requests. This document outlines the process to help get your contribution
 accepted.
 
+## How to build and test locally
+We try to put everything you need to create a patch in the [Makefile](../Makefile).
+If you find that a helpful task is missing, let us know!
+
+* `make build` builds to `bin/svcat`.
+* `make build VERSION=v1.2.3` build and force a specific version instead of using git.
+* `make test` runs the test suite.
+* `make test UPDATE_GOLDEN=true` runs the tests and updates the golden files if the command
+    output has changed, rather than failing the test. Run this after changing
+    the output of any commands.
+* `make get-dep` installs the latest release of [dep](https://github.com/golang/dep).
+    This is only required if you are alterning the projects dependencies.
+    You don't need it in order to build, because we check-in vendor.
+
 ## Contributor License Agreements
 
 We'd love to accept your patches! Before we can take them, we have to jump a
