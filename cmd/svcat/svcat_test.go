@@ -9,6 +9,8 @@ import (
 )
 
 func TestCommandOutput(t *testing.T) {
+	// TODO: spin up a mock server and point our kubecontext at it
+
 	testcases := []struct {
 		name   string // Test Name
 		cmd    string // Command to run

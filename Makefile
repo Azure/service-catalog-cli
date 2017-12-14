@@ -5,6 +5,7 @@ VERSION ?= $(shell git describe --tags --dirty='+dev' 2> /dev/null)
 LDFLAGS = -w -X main.commit=$(COMMIT) -X main.version=$(VERSION)
 GOBUILD = CGO_ENABLED=0 go build -a -tags netgo -ldflags '$(LDFLAGS)'
 RELEASE_DIR = bin/$(VERSION)
+UPDATE_GOLDEN ?= false
 
 build:
 	$(GOBUILD) -o bin/svcat ./cmd/svcat
@@ -50,7 +51,7 @@ verify-vendor: check-dep
 	fi
 
 test:
-	go test ./...
+	go test ./... --update=$(UPDATE_GOLDEN)
 
 deploy: clean cross-build
 	cp -R $(RELEASE_DIR) bin/latest/

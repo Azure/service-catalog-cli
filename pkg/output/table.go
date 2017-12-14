@@ -1,17 +1,23 @@
 package output
 
 import (
+	"io"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
 )
 
 // NewListTable builds a table formatted to list a set of results.
-func NewListTable() *tablewriter.Table {
-	t := tablewriter.NewWriter(os.Stdout)
+func NewListTable2(w io.Writer) *tablewriter.Table {
+	t := tablewriter.NewWriter(w)
 	t.SetBorder(false)
 	t.SetColumnSeparator(" ")
 	return t
+}
+
+// NewListTable builds a table formatted to list a set of results.
+func NewListTable() *tablewriter.Table {
+	return NewListTable2(os.Stdout)
 }
 
 // NewDetailsTable builds a table formatted to list details for a single result.

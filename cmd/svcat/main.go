@@ -7,6 +7,7 @@ import (
 	"github.com/Azure/service-catalog-cli/pkg/binding"
 	"github.com/Azure/service-catalog-cli/pkg/broker"
 	"github.com/Azure/service-catalog-cli/pkg/class"
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/environment"
 	"github.com/Azure/service-catalog-cli/pkg/instance"
 	"github.com/Azure/service-catalog-cli/pkg/kube"
@@ -31,6 +32,9 @@ func main() {
 
 func buildRootCommand() *cobra.Command {
 	// root command context
+	cxt := &command.Context{}
+
+	// root command flags
 	var opts struct {
 		Version bool
 	}
@@ -39,6 +43,10 @@ func buildRootCommand() *cobra.Command {
 		Use:          "svcat",
 		Short:        "The Kubernetes Service Catalog Command-Line Interface (CLI)",
 		SilenceUsage: true,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			// Enable tests to swap the output
+			cxt.Output = cmd.OutOrStdout()
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Version {
 				if commit == "" { // commit is empty for Homebrew builds
@@ -66,7 +74,7 @@ func buildRootCommand() *cobra.Command {
 		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
 	}
 
-	cmd.AddCommand(newGetCmd(cl))
+	cmd.AddCommand(newGetCmd(cxt, cl))
 	cmd.AddCommand(newDescribeCmd(cl))
 	cmd.AddCommand(newSyncCmd(cl))
 
@@ -103,13 +111,13 @@ func newSyncCmd(cl *clientset.Clientset) *cobra.Command {
 	return cmd
 }
 
-func newGetCmd(cl *clientset.Clientset) *cobra.Command {
+func newGetCmd(cxt *command.Context, cl *clientset.Clientset) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get",
 		Short: "List a resource, optionally filtered by name",
 	}
 	cmd.AddCommand(binding.NewGetCmd(cl))
-	cmd.AddCommand(broker.NewGetCmd(cl))
+	cmd.AddCommand(broker.NewGetCmd(cxt, cl))
 	cmd.AddCommand(class.NewGetCmd(cl))
 	cmd.AddCommand(instance.NewGetCmd(cl))
 	cmd.AddCommand(plan.NewGetCmd(cl))

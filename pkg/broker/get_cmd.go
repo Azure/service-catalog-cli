@@ -3,6 +3,7 @@ package broker
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
@@ -10,12 +11,13 @@ import (
 )
 
 type getCmd struct {
+	*command.Context
 	cl *clientset.Clientset
 }
 
 // NewGetCmd builds a "svcat get brokers" command
-func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
-	getCmd := getCmd{cl: cl}
+func NewGetCmd(cxt *command.Context, cl *clientset.Clientset) *cobra.Command {
+	getCmd := getCmd{Context: cxt, cl: cl}
 	cmd := &cobra.Command{
 		Use:     "brokers [name]",
 		Aliases: []string{"broker", "brk"},
@@ -47,7 +49,7 @@ func (c *getCmd) getAll() error {
 		return fmt.Errorf("Error listing brokers (%s)", err)
 	}
 
-	output.WriteBrokerList(brokers.Items...)
+	output.WriteBrokerList(c.Output, brokers.Items...)
 	return nil
 }
 
@@ -57,6 +59,6 @@ func (c *getCmd) get(name string) error {
 		return err
 	}
 
-	output.WriteBrokerList(*broker)
+	output.WriteBrokerList(c.Output, *broker)
 	return nil
 }
