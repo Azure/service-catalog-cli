@@ -50,7 +50,7 @@ verify-vendor: check-dep
 	fi
 
 test:
-	go test $$(glide nv)
+	go test ./...
 
 deploy: clean cross-build
 	cp -R $(RELEASE_DIR) bin/latest/
