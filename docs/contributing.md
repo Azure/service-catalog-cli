@@ -5,6 +5,8 @@ requests. This document outlines the process to help get your contribution
 accepted.
 
 ## How to build and test locally
+🚨 **Go 1.9+ required**
+
 We try to put everything you need to create a patch in the [Makefile](../Makefile).
 If you find that a helpful task is missing, let us know!
 
