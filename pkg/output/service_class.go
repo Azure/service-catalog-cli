@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
@@ -15,8 +16,8 @@ func getClassStatusText(status v1beta1.ClusterServiceClassStatus) string {
 }
 
 // WriteClassList prints a list of classes.
-func WriteClassList(classes ...v1beta1.ClusterServiceClass) {
-	t := NewListTable()
+func WriteClassList(w io.Writer, classes ...v1beta1.ClusterServiceClass) {
+	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
 		"Description",
@@ -33,9 +34,9 @@ func WriteClassList(classes ...v1beta1.ClusterServiceClass) {
 }
 
 // WriteParentClass prints identifying information for a parent class.
-func WriteParentClass(class *v1beta1.ClusterServiceClass) {
-	fmt.Println("\nClass:")
-	t := NewDetailsTable()
+func WriteParentClass(w io.Writer, class *v1beta1.ClusterServiceClass) {
+	fmt.Fprintln(w, "\nClass:")
+	t := NewDetailsTable(w)
 	t.AppendBulk([][]string{
 		{"Name:", class.Spec.ExternalName},
 		{"UUID:", string(class.Name)},
@@ -45,8 +46,8 @@ func WriteParentClass(class *v1beta1.ClusterServiceClass) {
 }
 
 // WriteClassDetails prints details for a single class.
-func WriteClassDetails(class *v1beta1.ClusterServiceClass) {
-	t := NewDetailsTable()
+func WriteClassDetails(w io.Writer, class *v1beta1.ClusterServiceClass) {
+	t := NewDetailsTable(w)
 	t.AppendBulk([][]string{
 		{"Name:", class.Spec.ExternalName},
 		{"Description:", class.Spec.Description},

@@ -56,7 +56,7 @@ func (c *getCmd) getAll() error {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
 
-	output.WriteClassList(classes.Items...)
+	output.WriteClassList(c.Output, classes.Items...)
 	return nil
 }
 
@@ -72,6 +72,6 @@ func (c *getCmd) get(key string) error {
 		return err
 	}
 
-	output.WriteClassList(*class)
+	output.WriteClassList(c.Output, *class)
 	return nil
 }

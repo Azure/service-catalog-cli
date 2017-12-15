@@ -76,7 +76,7 @@ func (c *describeCmd) describe(key string) error {
 		return fmt.Errorf("unable to get class (%s)", err)
 	}
 
-	output.WritePlanDetails(plan, class)
+	output.WritePlanDetails(c.Output, plan, class)
 
 	if c.traverse {
 		planOpts := v1.ListOptions{
@@ -86,7 +86,7 @@ func (c *describeCmd) describe(key string) error {
 		if err != nil {
 			return fmt.Errorf("unable to list instances (%s)", err)
 		}
-		output.WriteAssociatedInstances(instances)
+		output.WriteAssociatedInstances(c.Output, instances)
 	}
 
 	return nil

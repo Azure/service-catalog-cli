@@ -61,16 +61,16 @@ func (c *describeCmd) describe(name string) error {
 		return err
 	}
 
-	output.WriteInstanceDetails(instance)
+	output.WriteInstanceDetails(c.Output, instance)
 
 	if c.traverse {
 		class, plan, broker, err := traverse.InstanceParentHierarchy(c.Client, instance)
 		if err != nil {
 			return fmt.Errorf("unable to traverse up the instance hierarchy (%s)", err)
 		}
-		output.WriteParentClass(class)
-		output.WriteParentPlan(plan)
-		output.WriteParentBroker(broker)
+		output.WriteParentClass(c.Output, class)
+		output.WriteParentPlan(c.Output, plan)
+		output.WriteParentBroker(c.Output, broker)
 	}
 
 	return nil

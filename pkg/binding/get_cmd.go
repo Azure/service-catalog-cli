@@ -53,7 +53,7 @@ func (c *getCmd) getAll() error {
 		return err
 	}
 
-	output.WriteBindingList(bindings.Items...)
+	output.WriteBindingList(c.Output, bindings.Items...)
 	return nil
 }
 
@@ -63,6 +63,6 @@ func (c *getCmd) get(name string) error {
 		return err
 	}
 
-	output.WriteBindingList(*binding)
+	output.WriteBindingList(c.Output, *binding)
 	return nil
 }

@@ -39,20 +39,20 @@ func (c *syncCmd) sync(name string) error {
 	for j := 0; j < retries; j++ {
 		catalog, err := c.Client.ServicecatalogV1beta1().ClusterServiceBrokers().Get(name, v1.GetOptions{})
 		if err != nil {
-			logger.Fatalf("Error fetching ClusterServiceBrokers (%s)", err)
+			return fmt.Errorf("Error fetching ClusterServiceBrokers (%s)", err)
 		}
 
 		catalog.Spec.RelistRequests = catalog.Spec.RelistRequests + 1
 
 		_, err = c.Client.ServicecatalogV1beta1().ClusterServiceBrokers().Update(catalog)
 		if err == nil {
-			logger.Printf("Successfully fetched catalog entries from %s broker", name)
+			fmt.Fprintf(c.Output, "Successfully fetched catalog entries from %s broker", name)
 			return nil
 		}
 		if !errors.IsConflict(err) {
 			return err
 		}
-		logger.Printf("Conflict when syncing service broker, retries left: %v", retries-j)
+		fmt.Fprintf(c.Output, "Conflict when syncing service broker, retries left: %v", retries-j)
 	}
 	return fmt.Errorf("Failed to sync service broker")
 }

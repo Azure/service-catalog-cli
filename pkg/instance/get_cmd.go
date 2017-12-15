@@ -52,7 +52,7 @@ func (c *getCmd) getAll() error {
 		return err
 	}
 
-	output.WriteInstanceList(instances.Items...)
+	output.WriteInstanceList(c.Output, instances.Items...)
 	return nil
 }
 
@@ -62,6 +62,6 @@ func (c *getCmd) get(name string) error {
 		return err
 	}
 
-	output.WriteInstanceList(*instance)
+	output.WriteInstanceList(c.Output, *instance)
 	return nil
 }

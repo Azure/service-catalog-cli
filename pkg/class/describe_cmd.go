@@ -70,7 +70,7 @@ func (c *describeCmd) describe(key string) error {
 		return err
 	}
 
-	output.WriteClassDetails(class)
+	output.WriteClassDetails(c.Output, class)
 
 	if c.traverse {
 		planOpts := v1.ListOptions{
@@ -81,7 +81,7 @@ func (c *describeCmd) describe(key string) error {
 			return fmt.Errorf("unable to list plans (%s)", err)
 		}
 
-		output.WriteAssociatedPlans(plans.Items)
+		output.WriteAssociatedPlans(c.Output, plans.Items)
 	}
 
 	return nil

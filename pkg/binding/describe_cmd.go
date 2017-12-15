@@ -61,17 +61,17 @@ func (c *describeCmd) describe(name string) error {
 		return err
 	}
 
-	output.WriteBindingDetails(binding)
+	output.WriteBindingDetails(c.Output, binding)
 
 	if c.traverse {
 		instance, class, plan, broker, err := traverse.BindingParentHierarchy(c.Client, binding)
 		if err != nil {
 			return fmt.Errorf("unable to traverse up the binding hierarchy (%s)", err)
 		}
-		output.WriteParentInstance(instance)
-		output.WriteParentClass(class)
-		output.WriteParentPlan(plan)
-		output.WriteParentBroker(broker)
+		output.WriteParentInstance(c.Output, instance)
+		output.WriteParentClass(c.Output, class)
+		output.WriteParentPlan(c.Output, plan)
+		output.WriteParentBroker(c.Output, broker)
 	}
 
 	return nil

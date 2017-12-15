@@ -46,6 +46,6 @@ func (c *describeCmd) describe(name string) error {
 		return err
 	}
 
-	output.WriteBrokerDetails(broker)
+	output.WriteBrokerDetails(c.Output, broker)
 	return nil
 }

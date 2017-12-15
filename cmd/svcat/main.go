@@ -60,11 +60,11 @@ func buildRootCommand() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Version {
-				printVersion()
+				printVersion(cxt)
 				return nil
 			}
 
-			fmt.Print(cmd.UsageString())
+			fmt.Fprint(cxt.Output, cmd.UsageString())
 			return nil
 		},
 	}
@@ -79,11 +79,11 @@ func buildRootCommand() *cobra.Command {
 	return cmd
 }
 
-func printVersion() {
+func printVersion(cxt *command.Context) {
 	if commit == "" { // commit is empty for Homebrew builds
-		fmt.Printf("svcat %s\n", version)
+		fmt.Fprintf(cxt.Output, "svcat %s\n", version)
 	} else {
-		fmt.Printf("svcat %s (%s)\n", version, commit)
+		fmt.Fprintf(cxt.Output, "svcat %s (%s)\n", version, commit)
 	}
 }
 
@@ -100,7 +100,7 @@ func configForContext(vars environment.EnvSettings) (*rest.Config, error) {
 func getKubeClient(vars environment.EnvSettings) (*rest.Config, *clientset.Clientset, error) {
 	config, err := configForContext(vars)
 	if err != nil {
-		logger.Fatalf("Error getting Kubernetes configuration (%s)", err)
+		return nil, nil, fmt.Errorf("Error getting Kubernetes configuration (%s)", err)
 	}
 	client, err := clientset.NewForConfig(config)
 	return nil, client, err

@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 )
@@ -24,8 +25,8 @@ func getInstanceStatusShort(status v1beta1.ServiceInstanceStatus) string {
 }
 
 // WriteInstanceList prints a list of instances.
-func WriteInstanceList(instances ...v1beta1.ServiceInstance) {
-	t := NewListTable()
+func WriteInstanceList(w io.Writer, instances ...v1beta1.ServiceInstance) {
+	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
 		"Namespace",
@@ -48,9 +49,9 @@ func WriteInstanceList(instances ...v1beta1.ServiceInstance) {
 }
 
 // WriteParentInstance prints identifying information for a parent instance.
-func WriteParentInstance(instance *v1beta1.ServiceInstance) {
-	fmt.Println("\nInstance:")
-	t := NewDetailsTable()
+func WriteParentInstance(w io.Writer, instance *v1beta1.ServiceInstance) {
+	fmt.Fprintln(w, "\nInstance:")
+	t := NewDetailsTable(w)
 	t.AppendBulk([][]string{
 		{"Name:", instance.Name},
 		{"Namespace:", instance.Namespace},
@@ -60,14 +61,14 @@ func WriteParentInstance(instance *v1beta1.ServiceInstance) {
 }
 
 // WriteAssociatedInstances prints a list of instances associated with a plan.
-func WriteAssociatedInstances(instances *v1beta1.ServiceInstanceList) {
-	fmt.Println("\nInstances:")
+func WriteAssociatedInstances(w io.Writer, instances *v1beta1.ServiceInstanceList) {
+	fmt.Fprintln(w, "\nInstances:")
 	if len(instances.Items) == 0 {
-		fmt.Println("No instances defined")
+		fmt.Fprintln(w, "No instances defined")
 		return
 	}
 
-	t := NewListTable()
+	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
 		"Namespace",
@@ -84,8 +85,8 @@ func WriteAssociatedInstances(instances *v1beta1.ServiceInstanceList) {
 }
 
 // WriteInstanceDetails prints an instance.
-func WriteInstanceDetails(instance *v1beta1.ServiceInstance) {
-	t := NewDetailsTable()
+func WriteInstanceDetails(w io.Writer, instance *v1beta1.ServiceInstance) {
+	t := NewDetailsTable(w)
 
 	t.AppendBulk([][]string{
 		{"Name:", instance.Name},

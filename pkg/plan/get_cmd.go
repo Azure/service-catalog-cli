@@ -62,7 +62,7 @@ func (c *getCmd) getAll() error {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
 
-	output.WritePlanList(plans.Items, classes.Items)
+	output.WritePlanList(c.Output, plans.Items, classes.Items)
 	return nil
 }
 
@@ -81,7 +81,7 @@ func (c *getCmd) get(key string) error {
 		return fmt.Errorf("unable to get class '%s' (%s)", plan.Spec.ClusterServiceClassRef.Name, err)
 	}
 
-	output.WritePlanList([]v1beta1.ClusterServicePlan{*plan}, []v1beta1.ClusterServiceClass{*class})
+	output.WritePlanList(c.Output, []v1beta1.ClusterServicePlan{*plan}, []v1beta1.ClusterServiceClass{*class})
 
 	return nil
 }
