@@ -27,29 +27,37 @@ func buildTestdataPath(relpath string) (string, error) {
 	return path, nil
 }
 
+// GetTestdata returns the contents of a testdata file.
+// * relpath - relative path to the file in the test's testdata directory.
+func GetTestdata(relpath string) (fullpath string, contents []byte, err error) {
+	fullpath, err = buildTestdataPath(relpath)
+	if err != nil {
+		return "", nil, err
+	}
+
+	contents, err = ioutil.ReadFile(fullpath)
+	return fullpath, contents, errors.Wrapf(err, "unable to read testdata %s", fullpath)
+}
+
 // AssertEqualsGoldenFile asserts that the value equals the contents of the golden file.
 // When the go test -update flag is present, the golden file is updated to match, rather than failing the test.
-func AssertEqualsGoldenFile(t *testing.T, goldenFile string, got []byte) {
+func AssertEqualsGoldenFile(t *testing.T, goldenFile string, got string) {
 	t.Helper()
 
-	path, err := buildTestdataPath(goldenFile)
+	path, want, err := GetTestdata(goldenFile)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
 
-	want, err := ioutil.ReadFile(path)
-	if err != nil {
-		t.Fatalf("%+v", errors.Wrapf(err, "unable to read golden file %s", path))
-	}
-
-	if !bytes.Equal(want, got) {
+	gotB := []byte(got)
+	if !bytes.Equal(want, gotB) {
 		if *UpdateGolden {
-			err := ioutil.WriteFile(path, got, 0666)
+			err := ioutil.WriteFile(path, gotB, 0666)
 			if err != nil {
 				t.Fatalf("%+v", errors.Wrapf(err, "unable to update golden file %s", path))
 			}
 		} else {
-			t.Fatalf("does not match golden file %s\n\nWANT:\n%q\n\nGOT:\n%q\n", path, want, got)
+			t.Fatalf("does not match golden file %s\n\nWANT:\n%q\n\nGOT:\n%q\n", path, want, gotB)
 		}
 	}
 }
