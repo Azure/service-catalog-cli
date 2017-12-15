@@ -3,23 +3,23 @@ package plan
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 )
 
 type describeCmd struct {
-	cl           *clientset.Clientset
+	*command.Context
 	traverse     bool
 	lookupByUUID bool
 }
 
 // NewDescribeCmd builds a "svcat describe plan" command
-func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
-	describeCmd := &describeCmd{cl: cl}
+func NewDescribeCmd(cxt *command.Context) *cobra.Command {
+	describeCmd := &describeCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "plan NAME",
 		Aliases: []string{"plans", "pl"},
@@ -62,16 +62,16 @@ func (c *describeCmd) describe(key string) error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = retrieveByUUID(c.cl, key)
+		plan, err = retrieveByUUID(c.Client, key)
 	} else {
-		plan, err = retrieveByName(c.cl, key)
+		plan, err = retrieveByName(c.Client, key)
 	}
 	if err != nil {
 		return err
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := c.cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
+	class, err := c.Client.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("unable to get class (%s)", err)
 	}
@@ -82,7 +82,7 @@ func (c *describeCmd) describe(key string) error {
 		planOpts := v1.ListOptions{
 			FieldSelector: fields.OneTermEqualSelector(fieldServiceClassRef, plan.Name).String(),
 		}
-		instances, err := c.cl.ServicecatalogV1beta1().ServiceInstances("").List(planOpts)
+		instances, err := c.Client.ServicecatalogV1beta1().ServiceInstances("").List(planOpts)
 		if err != nil {
 			return fmt.Errorf("unable to list instances (%s)", err)
 		}

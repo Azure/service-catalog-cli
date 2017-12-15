@@ -3,21 +3,21 @@ package plan
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type getCmd struct {
-	cl           *clientset.Clientset
+	*command.Context
 	lookupByUUID bool
 }
 
 // NewGetCmd builds a "svcat get plans" command
-func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
-	getCmd := &getCmd{cl: cl}
+func NewGetCmd(cxt *command.Context) *cobra.Command {
+	getCmd := &getCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "plans [name]",
 		Aliases: []string{"plan", "pl"},
@@ -51,13 +51,13 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	plans, err := c.cl.ServicecatalogV1beta1().ClusterServicePlans().List(v1.ListOptions{})
+	plans, err := c.Client.ServicecatalogV1beta1().ClusterServicePlans().List(v1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("unable to list plans (%s)", err)
 	}
 
 	// Retrieve the classes as well because plans don't have the external class name
-	classes, err := c.cl.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
+	classes, err := c.Client.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
@@ -70,13 +70,13 @@ func (c *getCmd) get(key string) error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = retrieveByUUID(c.cl, key)
+		plan, err = retrieveByUUID(c.Client, key)
 	} else {
-		plan, err = retrieveByName(c.cl, key)
+		plan, err = retrieveByName(c.Client, key)
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := c.cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
+	class, err := c.Client.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("unable to get class '%s' (%s)", plan.Spec.ClusterServiceClassRef.Name, err)
 	}

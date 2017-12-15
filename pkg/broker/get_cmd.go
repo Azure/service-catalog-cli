@@ -5,19 +5,17 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type getCmd struct {
 	*command.Context
-	cl *clientset.Clientset
 }
 
 // NewGetCmd builds a "svcat get brokers" command
-func NewGetCmd(cxt *command.Context, cl *clientset.Clientset) *cobra.Command {
-	getCmd := getCmd{Context: cxt, cl: cl}
+func NewGetCmd(cxt *command.Context) *cobra.Command {
+	getCmd := getCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "brokers [name]",
 		Aliases: []string{"broker", "brk"},
@@ -44,7 +42,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	brokers, err := c.cl.ServicecatalogV1beta1().ClusterServiceBrokers().List(v1.ListOptions{})
+	brokers, err := c.Client.ServicecatalogV1beta1().ClusterServiceBrokers().List(v1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("Error listing brokers (%s)", err)
 	}
@@ -54,7 +52,7 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get(name string) error {
-	broker, err := retrieveByName(c.cl, name)
+	broker, err := retrieveByName(c.Client, name)
 	if err != nil {
 		return err
 	}

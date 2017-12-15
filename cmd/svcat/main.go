@@ -33,6 +33,7 @@ func main() {
 func buildRootCommand() *cobra.Command {
 	// root command context
 	cxt := &command.Context{}
+	env := environment.EnvSettings{}
 
 	// root command flags
 	var opts struct {
@@ -43,17 +44,23 @@ func buildRootCommand() *cobra.Command {
 		Use:          "svcat",
 		Short:        "The Kubernetes Service Catalog Command-Line Interface (CLI)",
 		SilenceUsage: true,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// Enable tests to swap the output
 			cxt.Output = cmd.OutOrStdout()
+
+			// Initialize a service catalog client
+			env.Init()
+			_, cl, err := getKubeClient(env)
+			if err != nil {
+				return fmt.Errorf("Error connecting to Kubernetes (%s)", err)
+			}
+			cxt.Client = cl
+
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Version {
-				if commit == "" { // commit is empty for Homebrew builds
-					fmt.Printf("svcat %s\n", version)
-				} else {
-					fmt.Printf("svcat %s (%s)\n", version, commit)
-				}
+				printVersion()
 				return nil
 			}
 
@@ -63,22 +70,21 @@ func buildRootCommand() *cobra.Command {
 	}
 
 	cmd.Flags().BoolVarP(&opts.Version, "version", "v", false, "Show the application version")
+	env.AddFlags(cmd.PersistentFlags())
 
-	flags := cmd.PersistentFlags()
-
-	// adds the appropriate persistent flags, parses them, and negotiates values based on existing environment variables
-	vars := environment.New(os.Args, flags)
-
-	_, cl, err := getKubeClient(vars)
-	if err != nil {
-		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
-	}
-
-	cmd.AddCommand(newGetCmd(cxt, cl))
-	cmd.AddCommand(newDescribeCmd(cl))
-	cmd.AddCommand(newSyncCmd(cl))
+	cmd.AddCommand(newGetCmd(cxt))
+	cmd.AddCommand(newDescribeCmd(cxt))
+	cmd.AddCommand(newSyncCmd(cxt))
 
 	return cmd
+}
+
+func printVersion() {
+	if commit == "" { // commit is empty for Homebrew builds
+		fmt.Printf("svcat %s\n", version)
+	} else {
+		fmt.Printf("svcat %s (%s)\n", version, commit)
+	}
 }
 
 // configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
@@ -100,41 +106,41 @@ func getKubeClient(vars environment.EnvSettings) (*rest.Config, *clientset.Clien
 	return nil, client, err
 }
 
-func newSyncCmd(cl *clientset.Clientset) *cobra.Command {
+func newSyncCmd(cxt *command.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sync",
 		Short:   "Syncs service catalog for a service broker",
 		Aliases: []string{"relist"},
 	}
-	cmd.AddCommand(broker.NewSyncCmd(cl))
+	cmd.AddCommand(broker.NewSyncCmd(cxt))
 
 	return cmd
 }
 
-func newGetCmd(cxt *command.Context, cl *clientset.Clientset) *cobra.Command {
+func newGetCmd(cxt *command.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get",
 		Short: "List a resource, optionally filtered by name",
 	}
-	cmd.AddCommand(binding.NewGetCmd(cl))
-	cmd.AddCommand(broker.NewGetCmd(cxt, cl))
-	cmd.AddCommand(class.NewGetCmd(cl))
-	cmd.AddCommand(instance.NewGetCmd(cl))
-	cmd.AddCommand(plan.NewGetCmd(cl))
+	cmd.AddCommand(binding.NewGetCmd(cxt))
+	cmd.AddCommand(broker.NewGetCmd(cxt))
+	cmd.AddCommand(class.NewGetCmd(cxt))
+	cmd.AddCommand(instance.NewGetCmd(cxt))
+	cmd.AddCommand(plan.NewGetCmd(cxt))
 
 	return cmd
 }
 
-func newDescribeCmd(cl *clientset.Clientset) *cobra.Command {
+func newDescribeCmd(cxt *command.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "describe",
 		Short: "Show details of a specific resource",
 	}
-	cmd.AddCommand(binding.NewDescribeCmd(cl))
-	cmd.AddCommand(broker.NewDescribeCmd(cl))
-	cmd.AddCommand(class.NewDescribeCmd(cl))
-	cmd.AddCommand(instance.NewDescribeCmd(cl))
-	cmd.AddCommand(plan.NewDescribeCmd(cl))
+	cmd.AddCommand(binding.NewDescribeCmd(cxt))
+	cmd.AddCommand(broker.NewDescribeCmd(cxt))
+	cmd.AddCommand(class.NewDescribeCmd(cxt))
+	cmd.AddCommand(instance.NewDescribeCmd(cxt))
+	cmd.AddCommand(plan.NewDescribeCmd(cxt))
 
 	return cmd
 }

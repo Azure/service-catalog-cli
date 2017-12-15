@@ -3,23 +3,23 @@ package class
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 )
 
 type describeCmd struct {
-	cl           *clientset.Clientset
+	*command.Context
 	traverse     bool
 	lookupByUUID bool
 }
 
 // NewDescribeCmd builds a "svcat describe class" command
-func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
-	describeCmd := &describeCmd{cl: cl}
+func NewDescribeCmd(cxt *command.Context) *cobra.Command {
+	describeCmd := &describeCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "class NAME",
 		Aliases: []string{"classes", "cl"},
@@ -62,9 +62,9 @@ func (c *describeCmd) describe(key string) error {
 	var class *v1beta1.ClusterServiceClass
 	var err error
 	if c.lookupByUUID {
-		class, err = retrieveByUUID(c.cl, key)
+		class, err = retrieveByUUID(c.Client, key)
 	} else {
-		class, err = retrieveByName(c.cl, key)
+		class, err = retrieveByName(c.Client, key)
 	}
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (c *describeCmd) describe(key string) error {
 		planOpts := v1.ListOptions{
 			FieldSelector: fields.OneTermEqualSelector(fieldServiceClassRef, class.Name).String(),
 		}
-		plans, err := c.cl.ServicecatalogV1beta1().ClusterServicePlans().List(planOpts)
+		plans, err := c.Client.ServicecatalogV1beta1().ClusterServicePlans().List(planOpts)
 		if err != nil {
 			return fmt.Errorf("unable to list plans (%s)", err)
 		}
