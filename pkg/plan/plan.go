@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	fieldExternalName    = "spec.externalName"
-	fieldServiceClassRef = "spec.clusterServicePlanRef.name"
+	fieldExternalName = "spec.externalName"
 )
 
 func retrieveByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServicePlan, error) {

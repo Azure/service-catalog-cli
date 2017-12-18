@@ -63,6 +63,12 @@ func (c *describeCmd) describe(name string) error {
 
 	output.WriteInstanceDetails(instance)
 
+	bindings, err := traverse.InstanceToBindings(c.cl, instance)
+	if err != nil {
+		return err
+	}
+	output.WriteAssociatedBindings(bindings)
+
 	if c.traverse {
 		class, plan, broker, err := traverse.InstanceParentHierarchy(c.cl, instance)
 		if err != nil {
