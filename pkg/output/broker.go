@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 )
@@ -24,8 +25,8 @@ func getBrokerStatusFull(status v1beta1.ClusterServiceBrokerStatus) string {
 }
 
 // WriteBrokerList prints a list of brokers.
-func WriteBrokerList(brokers ...v1beta1.ClusterServiceBroker) {
-	t := NewListTable()
+func WriteBrokerList(w io.Writer, brokers ...v1beta1.ClusterServiceBroker) {
+	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
 		"URL",
@@ -42,9 +43,9 @@ func WriteBrokerList(brokers ...v1beta1.ClusterServiceBroker) {
 }
 
 // WriteParentBroker prints identifying information for a parent broker.
-func WriteParentBroker(broker *v1beta1.ClusterServiceBroker) {
-	fmt.Println("\nBroker:")
-	t := NewDetailsTable()
+func WriteParentBroker(w io.Writer, broker *v1beta1.ClusterServiceBroker) {
+	fmt.Fprintln(w, "\nBroker:")
+	t := NewDetailsTable(w)
 	t.AppendBulk([][]string{
 		{"Name:", broker.Name},
 		{"Status:", getBrokerStatusShort(broker.Status)},
@@ -53,8 +54,8 @@ func WriteParentBroker(broker *v1beta1.ClusterServiceBroker) {
 }
 
 // WriteBrokerDetails prints details for a single broker.
-func WriteBrokerDetails(broker *v1beta1.ClusterServiceBroker) {
-	t := NewDetailsTable()
+func WriteBrokerDetails(w io.Writer, broker *v1beta1.ClusterServiceBroker) {
+	t := NewDetailsTable(w)
 
 	t.AppendBulk([][]string{
 		{"Name:", broker.Name},

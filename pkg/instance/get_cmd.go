@@ -1,19 +1,19 @@
 package instance
 
 import (
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
 
 type getCmd struct {
-	cl *clientset.Clientset
+	*command.Context
 	ns string
 }
 
 // NewGetCmd builds a "svcat get instances" command
-func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
-	getCmd := &getCmd{cl: cl}
+func NewGetCmd(cxt *command.Context) *cobra.Command {
+	getCmd := &getCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "instances [name]",
 		Aliases: []string{"instance", "inst"},
@@ -47,21 +47,21 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	instances, err := retrieveAll(c.cl, c.ns)
+	instances, err := retrieveAll(c.Client, c.ns)
 	if err != nil {
 		return err
 	}
 
-	output.WriteInstanceList(instances.Items...)
+	output.WriteInstanceList(c.Output, instances.Items...)
 	return nil
 }
 
 func (c *getCmd) get(name string) error {
-	instance, err := retrieveByName(c.cl, c.ns, name)
+	instance, err := retrieveByName(c.Client, c.ns, name)
 	if err != nil {
 		return err
 	}
 
-	output.WriteInstanceList(*instance)
+	output.WriteInstanceList(c.Output, *instance)
 	return nil
 }

@@ -3,21 +3,21 @@ package binding
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/Azure/service-catalog-cli/pkg/traverse"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
 
 type describeCmd struct {
-	cl       *clientset.Clientset
+	*command.Context
 	ns       string
 	traverse bool
 }
 
 // NewDescribeCmd builds a "svcat describe binding" command
-func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
-	describeCmd := &describeCmd{cl: cl}
+func NewDescribeCmd(cxt *command.Context) *cobra.Command {
+	describeCmd := &describeCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "binding NAME",
 		Aliases: []string{"bindings", "bnd"},
@@ -56,22 +56,22 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe(name string) error {
-	binding, err := retrieveByName(c.cl, c.ns, name)
+	binding, err := retrieveByName(c.Client, c.ns, name)
 	if err != nil {
 		return err
 	}
 
-	output.WriteBindingDetails(binding)
+	output.WriteBindingDetails(c.Output, binding)
 
 	if c.traverse {
-		instance, class, plan, broker, err := traverse.BindingParentHierarchy(c.cl, binding)
+		instance, class, plan, broker, err := traverse.BindingParentHierarchy(c.Client, binding)
 		if err != nil {
 			return fmt.Errorf("unable to traverse up the binding hierarchy (%s)", err)
 		}
-		output.WriteParentInstance(instance)
-		output.WriteParentClass(class)
-		output.WriteParentPlan(plan)
-		output.WriteParentBroker(broker)
+		output.WriteParentInstance(c.Output, instance)
+		output.WriteParentClass(c.Output, class)
+		output.WriteParentPlan(c.Output, plan)
+		output.WriteParentBroker(c.Output, broker)
 	}
 
 	return nil

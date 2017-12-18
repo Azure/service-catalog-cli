@@ -1,19 +1,19 @@
 package binding
 
 import (
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
 
 type getCmd struct {
-	cl *clientset.Clientset
+	*command.Context
 	ns string
 }
 
 // NewGetCmd builds a "svcat get bindings" command
-func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
-	getCmd := getCmd{cl: cl}
+func NewGetCmd(cxt *command.Context) *cobra.Command {
+	getCmd := getCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "bindings [name]",
 		Aliases: []string{"binding", "bnd"},
@@ -48,21 +48,21 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	bindings, err := retrieveAll(c.cl, c.ns)
+	bindings, err := retrieveAll(c.Client, c.ns)
 	if err != nil {
 		return err
 	}
 
-	output.WriteBindingList(bindings.Items...)
+	output.WriteBindingList(c.Output, bindings.Items...)
 	return nil
 }
 
 func (c *getCmd) get(name string) error {
-	binding, err := retrieveByName(c.cl, c.ns, name)
+	binding, err := retrieveByName(c.Client, c.ns, name)
 	if err != nil {
 		return err
 	}
 
-	output.WriteBindingList(*binding)
+	output.WriteBindingList(c.Output, *binding)
 	return nil
 }

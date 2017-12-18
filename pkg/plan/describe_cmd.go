@@ -3,22 +3,22 @@ package plan
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
 
 type describeCmd struct {
-	cl           *clientset.Clientset
+	*command.Context
 	traverse     bool
 	lookupByUUID bool
 }
 
 // NewDescribeCmd builds a "svcat describe plan" command
-func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
-	describeCmd := &describeCmd{cl: cl}
+func NewDescribeCmd(cxt *command.Context) *cobra.Command {
+	describeCmd := &describeCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "plan NAME",
 		Aliases: []string{"plans", "pl"},
@@ -61,35 +61,35 @@ func (c *describeCmd) describe(key string) error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = retrieveByUUID(c.cl, key)
+		plan, err = retrieveByUUID(c.Client, key)
 	} else {
-		plan, err = retrieveByName(c.cl, key)
+		plan, err = retrieveByName(c.Client, key)
 	}
 	if err != nil {
 		return err
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := traverse.PlanToClass(c.cl, plan)
+	class, err := traverse.PlanToClass(c.Client, plan)
 	if err != nil {
 		return err
 	}
 
-	output.WritePlanDetails(plan, class)
+	output.WritePlanDetails(c.Output, plan, class)
 
-	instances, err := traverse.PlanToInstances(c.cl, plan)
+	instances, err := traverse.PlanToInstances(c.Client, plan)
 	if err != nil {
 		return err
 	}
-	output.WriteAssociatedInstances(instances)
+	output.WriteAssociatedInstances(c.Output, instances)
 
 	if c.traverse {
-		broker, err := traverse.ClassToBroker(c.cl, class)
+		broker, err := traverse.ClassToBroker(c.Client, class)
 		if err != nil {
 			return err
 		}
-		output.WriteParentClass(class)
-		output.WriteParentBroker(broker)
+		output.WriteParentClass(c.Output, class)
+		output.WriteParentBroker(c.Output, broker)
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"io"
 	"sort"
 	"strconv"
 
@@ -30,7 +31,7 @@ func (a byClass) Less(i, j int) bool {
 }
 
 // WritePlanList prints a list of plans.
-func WritePlanList(plans []v1beta1.ClusterServicePlan, classes []v1beta1.ClusterServiceClass) {
+func WritePlanList(w io.Writer, plans []v1beta1.ClusterServicePlan, classes []v1beta1.ClusterServiceClass) {
 	classNames := map[string]string{}
 	for _, class := range classes {
 		classNames[class.Name] = class.Spec.ExternalName
@@ -38,7 +39,7 @@ func WritePlanList(plans []v1beta1.ClusterServicePlan, classes []v1beta1.Cluster
 
 	sort.Sort(byClass(plans))
 
-	t := NewListTable()
+	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
 		"Class",
@@ -55,14 +56,14 @@ func WritePlanList(plans []v1beta1.ClusterServicePlan, classes []v1beta1.Cluster
 }
 
 // WriteAssociatedPlans prints a list of plans associated with a class.
-func WriteAssociatedPlans(plans []v1beta1.ClusterServicePlan) {
-	fmt.Println("\nPlans:")
+func WriteAssociatedPlans(w io.Writer, plans []v1beta1.ClusterServicePlan) {
+	fmt.Fprintln(w, "\nPlans:")
 	if len(plans) == 0 {
-		fmt.Println("No plans defined")
+		fmt.Fprintln(w, "No plans defined")
 		return
 	}
 
-	t := NewListTable()
+	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
 		"Description",
@@ -77,9 +78,9 @@ func WriteAssociatedPlans(plans []v1beta1.ClusterServicePlan) {
 }
 
 // WriteParentPlan prints identifying information for a parent class.
-func WriteParentPlan(plan *v1beta1.ClusterServicePlan) {
-	fmt.Println("\nPlan:")
-	t := NewDetailsTable()
+func WriteParentPlan(w io.Writer, plan *v1beta1.ClusterServicePlan) {
+	fmt.Fprintln(w, "\nPlan:")
+	t := NewDetailsTable(w)
 	t.AppendBulk([][]string{
 		{"Name:", plan.Spec.ExternalName},
 		{"UUID:", string(plan.Name)},
@@ -89,8 +90,8 @@ func WriteParentPlan(plan *v1beta1.ClusterServicePlan) {
 }
 
 // WritePlanDetails prints details for a single plan.
-func WritePlanDetails(plan *v1beta1.ClusterServicePlan, class *v1beta1.ClusterServiceClass) {
-	t := NewDetailsTable()
+func WritePlanDetails(w io.Writer, plan *v1beta1.ClusterServicePlan, class *v1beta1.ClusterServiceClass) {
+	t := NewDetailsTable(w)
 
 	t.AppendBulk([][]string{
 		{"Name:", plan.Spec.ExternalName},

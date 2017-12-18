@@ -3,22 +3,22 @@ package class
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
 
 type describeCmd struct {
-	cl           *clientset.Clientset
+	*command.Context
 	traverse     bool
 	lookupByUUID bool
 }
 
 // NewDescribeCmd builds a "svcat describe class" command
-func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
-	describeCmd := &describeCmd{cl: cl}
+func NewDescribeCmd(cxt *command.Context) *cobra.Command {
+	describeCmd := &describeCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "class NAME",
 		Aliases: []string{"classes", "cl"},
@@ -61,28 +61,29 @@ func (c *describeCmd) describe(key string) error {
 	var class *v1beta1.ClusterServiceClass
 	var err error
 	if c.lookupByUUID {
-		class, err = retrieveByUUID(c.cl, key)
+		class, err = retrieveByUUID(c.Client, key)
 	} else {
-		class, err = retrieveByName(c.cl, key)
+		class, err = retrieveByName(c.Client, key)
 	}
 	if err != nil {
 		return err
 	}
 
-	output.WriteClassDetails(class)
+	output.WriteClassDetails(c.Output, class)
 
-	plans, err := traverse.ClassToPlans(c.cl, class)
+	plans, err := traverse.ClassToPlans(c.Client, class)
 	if err != nil {
 		return err
 	}
-	output.WriteAssociatedPlans(plans)
+	output.WriteAssociatedPlans(c.Output, plans)
 
 	if c.traverse {
-		broker, err := traverse.ClassToBroker(c.cl, class)
+		broker, err := traverse.ClassToBroker(c.Client, class)
 		if err != nil {
 			return err
 		}
-		output.WriteParentBroker(broker)
+		output.WriteParentBroker(c.Output, broker)
+		output.WriteAssociatedPlans(c.Output, plans)
 	}
 
 	return nil

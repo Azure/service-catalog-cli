@@ -3,21 +3,21 @@ package instance
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/Azure/service-catalog-cli/pkg/traverse"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
 
 type describeCmd struct {
-	cl       *clientset.Clientset
+	*command.Context
 	ns       string
 	traverse bool
 }
 
 // NewDescribeCmd builds a "svcat describe instance" command
-func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
-	describeCmd := &describeCmd{cl: cl}
+func NewDescribeCmd(cxt *command.Context) *cobra.Command {
+	describeCmd := &describeCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "instance NAME",
 		Aliases: []string{"instances", "inst"},
@@ -56,27 +56,27 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe(name string) error {
-	instance, err := retrieveByName(c.cl, c.ns, name)
+	instance, err := retrieveByName(c.Client, c.ns, name)
 	if err != nil {
 		return err
 	}
 
-	output.WriteInstanceDetails(instance)
+	output.WriteInstanceDetails(c.Output, instance)
 
-	bindings, err := traverse.InstanceToBindings(c.cl, instance)
+	bindings, err := traverse.InstanceToBindings(c.Client, instance)
 	if err != nil {
 		return err
 	}
-	output.WriteAssociatedBindings(bindings)
+	output.WriteAssociatedBindings(c.Output, bindings)
 
 	if c.traverse {
-		class, plan, broker, err := traverse.InstanceParentHierarchy(c.cl, instance)
+		class, plan, broker, err := traverse.InstanceParentHierarchy(c.Client, instance)
 		if err != nil {
 			return fmt.Errorf("unable to traverse up the instance hierarchy (%s)", err)
 		}
-		output.WriteParentClass(class)
-		output.WriteParentPlan(plan)
-		output.WriteParentBroker(broker)
+		output.WriteParentClass(c.Output, class)
+		output.WriteParentPlan(c.Output, plan)
+		output.WriteParentBroker(c.Output, broker)
 	}
 
 	return nil

@@ -7,6 +7,7 @@ import (
 	"github.com/Azure/service-catalog-cli/pkg/binding"
 	"github.com/Azure/service-catalog-cli/pkg/broker"
 	"github.com/Azure/service-catalog-cli/pkg/class"
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/environment"
 	"github.com/Azure/service-catalog-cli/pkg/instance"
 	"github.com/Azure/service-catalog-cli/pkg/kube"
@@ -23,7 +24,18 @@ var (
 )
 
 func main() {
+	cmd := buildRootCommand()
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func buildRootCommand() *cobra.Command {
 	// root command context
+	cxt := &command.Context{}
+	env := environment.EnvSettings{}
+
+	// root command flags
 	var opts struct {
 		Version bool
 	}
@@ -32,39 +44,46 @@ func main() {
 		Use:          "svcat",
 		Short:        "The Kubernetes Service Catalog Command-Line Interface (CLI)",
 		SilenceUsage: true,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// Enable tests to swap the output
+			cxt.Output = cmd.OutOrStdout()
+
+			// Initialize a service catalog client
+			env.Init()
+			_, cl, err := getKubeClient(env)
+			if err != nil {
+				return fmt.Errorf("Error connecting to Kubernetes (%s)", err)
+			}
+			cxt.Client = cl
+
+			return nil
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Version {
-				if commit == "" { // commit is empty for Homebrew builds
-					fmt.Printf("svcat %s\n", version)
-				} else {
-					fmt.Printf("svcat %s (%s)\n", version, commit)
-				}
+				printVersion(cxt)
 				return nil
 			}
 
-			fmt.Print(cmd.UsageString())
+			fmt.Fprint(cxt.Output, cmd.UsageString())
 			return nil
 		},
 	}
 
 	cmd.Flags().BoolVarP(&opts.Version, "version", "v", false, "Show the application version")
+	env.AddFlags(cmd.PersistentFlags())
 
-	flags := cmd.PersistentFlags()
+	cmd.AddCommand(newGetCmd(cxt))
+	cmd.AddCommand(newDescribeCmd(cxt))
+	cmd.AddCommand(newSyncCmd(cxt))
 
-	// adds the appropriate persistent flags, parses them, and negotiates values based on existing environment variables
-	vars := environment.New(os.Args, flags)
+	return cmd
+}
 
-	_, cl, err := getKubeClient(vars)
-	if err != nil {
-		logger.Fatalf("Error connecting to Kubernetes (%s)", err)
-	}
-
-	cmd.AddCommand(newGetCmd(cl))
-	cmd.AddCommand(newDescribeCmd(cl))
-	cmd.AddCommand(newSyncCmd(cl))
-
-	if err := cmd.Execute(); err != nil {
-		os.Exit(1)
+func printVersion(cxt *command.Context) {
+	if commit == "" { // commit is empty for Homebrew builds
+		fmt.Fprintf(cxt.Output, "svcat %s\n", version)
+	} else {
+		fmt.Fprintf(cxt.Output, "svcat %s (%s)\n", version, commit)
 	}
 }
 
@@ -81,47 +100,47 @@ func configForContext(vars environment.EnvSettings) (*rest.Config, error) {
 func getKubeClient(vars environment.EnvSettings) (*rest.Config, *clientset.Clientset, error) {
 	config, err := configForContext(vars)
 	if err != nil {
-		logger.Fatalf("Error getting Kubernetes configuration (%s)", err)
+		return nil, nil, fmt.Errorf("Error getting Kubernetes configuration (%s)", err)
 	}
 	client, err := clientset.NewForConfig(config)
 	return nil, client, err
 }
 
-func newSyncCmd(cl *clientset.Clientset) *cobra.Command {
+func newSyncCmd(cxt *command.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sync",
 		Short:   "Syncs service catalog for a service broker",
 		Aliases: []string{"relist"},
 	}
-	cmd.AddCommand(broker.NewSyncCmd(cl))
+	cmd.AddCommand(broker.NewSyncCmd(cxt))
 
 	return cmd
 }
 
-func newGetCmd(cl *clientset.Clientset) *cobra.Command {
+func newGetCmd(cxt *command.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get",
 		Short: "List a resource, optionally filtered by name",
 	}
-	cmd.AddCommand(binding.NewGetCmd(cl))
-	cmd.AddCommand(broker.NewGetCmd(cl))
-	cmd.AddCommand(class.NewGetCmd(cl))
-	cmd.AddCommand(instance.NewGetCmd(cl))
-	cmd.AddCommand(plan.NewGetCmd(cl))
+	cmd.AddCommand(binding.NewGetCmd(cxt))
+	cmd.AddCommand(broker.NewGetCmd(cxt))
+	cmd.AddCommand(class.NewGetCmd(cxt))
+	cmd.AddCommand(instance.NewGetCmd(cxt))
+	cmd.AddCommand(plan.NewGetCmd(cxt))
 
 	return cmd
 }
 
-func newDescribeCmd(cl *clientset.Clientset) *cobra.Command {
+func newDescribeCmd(cxt *command.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "describe",
 		Short: "Show details of a specific resource",
 	}
-	cmd.AddCommand(binding.NewDescribeCmd(cl))
-	cmd.AddCommand(broker.NewDescribeCmd(cl))
-	cmd.AddCommand(class.NewDescribeCmd(cl))
-	cmd.AddCommand(instance.NewDescribeCmd(cl))
-	cmd.AddCommand(plan.NewDescribeCmd(cl))
+	cmd.AddCommand(binding.NewDescribeCmd(cxt))
+	cmd.AddCommand(broker.NewDescribeCmd(cxt))
+	cmd.AddCommand(class.NewDescribeCmd(cxt))
+	cmd.AddCommand(instance.NewDescribeCmd(cxt))
+	cmd.AddCommand(plan.NewDescribeCmd(cxt))
 
 	return cmd
 }

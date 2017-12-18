@@ -3,20 +3,20 @@ package broker
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 )
 
 type describeCmd struct {
-	cl       *clientset.Clientset
+	*command.Context
 	ns       string
 	traverse bool
 }
 
 // NewDescribeCmd builds a "svcat describe broker" command
-func NewDescribeCmd(cl *clientset.Clientset) *cobra.Command {
-	describeCmd := &describeCmd{cl: cl}
+func NewDescribeCmd(cxt *command.Context) *cobra.Command {
+	describeCmd := &describeCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "broker NAME",
 		Aliases: []string{"brokers", "brk"},
@@ -41,11 +41,11 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe(name string) error {
-	broker, err := retrieveByName(c.cl, name)
+	broker, err := retrieveByName(c.Client, name)
 	if err != nil {
 		return err
 	}
 
-	output.WriteBrokerDetails(broker)
+	output.WriteBrokerDetails(c.Output, broker)
 	return nil
 }

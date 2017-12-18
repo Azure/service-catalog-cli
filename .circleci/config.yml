@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /go/src/github.com/Azure/service-catalog-cli
     docker:
-      - image: quay.io/deis/go-dev:v1.2.0
+      - image: quay.io/deis/go-dev:v1.6.0
     steps:
       - checkout
       - run:
@@ -12,7 +12,7 @@ jobs:
   test:
     working_directory: /go/src/github.com/Azure/service-catalog-cli
     docker:
-       - image: quay.io/deis/go-dev:v1.2.0
+       - image: quay.io/deis/go-dev:v1.6.0
     steps:
       - checkout
       - run:
@@ -21,7 +21,7 @@ jobs:
   verify-vendor:
     working_directory: /go/src/github.com/Azure/service-catalog-cli
     docker:
-       - image: quay.io/deis/go-dev:v1.2.0
+       - image: quay.io/deis/go-dev:v1.6.0
     steps:
       - checkout
       - run:
@@ -30,7 +30,7 @@ jobs:
   deploy:
     working_directory: /go/src/github.com/Azure/service-catalog-cli
     docker:
-      - image: quay.io/deis/go-dev:v1.2.0
+      - image: quay.io/deis/go-dev:v1.6.0
     steps:
       - checkout
       - run:

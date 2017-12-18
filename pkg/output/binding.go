@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 )
@@ -24,8 +25,8 @@ func getBindingStatusFull(status v1beta1.ServiceBindingStatus) string {
 }
 
 // WriteBindingDetails prints a list of bindings.
-func WriteBindingList(bindings ...v1beta1.ServiceBinding) {
-	t := NewListTable()
+func WriteBindingList(w io.Writer, bindings ...v1beta1.ServiceBinding) {
+	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
 		"Namespace",
@@ -46,8 +47,8 @@ func WriteBindingList(bindings ...v1beta1.ServiceBinding) {
 }
 
 // WriteBindingDetails prints details for a single binding.
-func WriteBindingDetails(binding *v1beta1.ServiceBinding) {
-	t := NewDetailsTable()
+func WriteBindingDetails(w io.Writer, binding *v1beta1.ServiceBinding) {
+	t := NewDetailsTable(w)
 
 	t.AppendBulk([][]string{
 		{"Name:", binding.Name},
@@ -60,14 +61,14 @@ func WriteBindingDetails(binding *v1beta1.ServiceBinding) {
 }
 
 // WriteAssociatedBindings prints a list of bindings associated with an instance.
-func WriteAssociatedBindings(bindings []v1beta1.ServiceBinding) {
-	fmt.Println("\nBindings:")
+func WriteAssociatedBindings(w io.Writer, bindings []v1beta1.ServiceBinding) {
+	fmt.Fprintln(w, "\nBindings:")
 	if len(bindings) == 0 {
-		fmt.Println("No bindings defined")
+		fmt.Fprintln(w, "No bindings defined")
 		return
 	}
 
-	t := NewListTable()
+	t := NewListTable(w)
 	t.SetHeader([]string{
 		"Name",
 		"Status",

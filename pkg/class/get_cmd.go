@@ -3,21 +3,21 @@ package class
 import (
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type getCmd struct {
-	cl           *clientset.Clientset
+	*command.Context
 	lookupByUUID bool
 }
 
 // NewGetCmd builds a "svcat get classes" command
-func NewGetCmd(cl *clientset.Clientset) *cobra.Command {
-	getCmd := &getCmd{cl: cl}
+func NewGetCmd(cxt *command.Context) *cobra.Command {
+	getCmd := &getCmd{Context: cxt}
 	cmd := &cobra.Command{
 		Use:     "classes [name]",
 		Aliases: []string{"class", "cl"},
@@ -51,12 +51,12 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	classes, err := c.cl.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
+	classes, err := c.Client.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
 
-	output.WriteClassList(classes.Items...)
+	output.WriteClassList(c.Output, classes.Items...)
 	return nil
 }
 
@@ -64,14 +64,14 @@ func (c *getCmd) get(key string) error {
 	var class *v1beta1.ClusterServiceClass
 	var err error
 	if c.lookupByUUID {
-		class, err = retrieveByUUID(c.cl, key)
+		class, err = retrieveByUUID(c.Client, key)
 	} else {
-		class, err = retrieveByName(c.cl, key)
+		class, err = retrieveByName(c.Client, key)
 	}
 	if err != nil {
 		return err
 	}
 
-	output.WriteClassList(*class)
+	output.WriteClassList(c.Output, *class)
 	return nil
 }
