@@ -72,7 +72,7 @@ func (c *getCmd) get(key string) error {
 	if c.lookupByUUID {
 		plan, err = retrieveByUUID(c.Client, key)
 	} else {
-		plan, err = retrieveByName(c.Client, key)
+		plan, err = RetrieveByName(c.Client, key)
 	}
 
 	// Retrieve the class as well because plans don't have the external class name

@@ -14,7 +14,7 @@ const (
 	fieldServiceClassRef = "spec.clusterServiceClassRef.name"
 )
 
-func retrieveByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServiceClass, error) {
+func RetrieveByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServiceClass, error) {
 	opts := v1.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(fieldExternalName, name).String(),
 	}

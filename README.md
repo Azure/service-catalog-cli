@@ -128,6 +128,14 @@ Plans:
   standard100   Standard Tier, 100 DTUs
 ```
 
+## Provision a service
+
+```console
+$ svcat provision quickstart-wordpress-mysql-instance \
+    --class azure-mysqldb --plan standard800 \
+    -p location=eastus -p resourceGroup=default
+```
+
 ## View all instances of a service plan on the cluster
 
 ```console
