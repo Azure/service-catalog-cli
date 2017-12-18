@@ -1,6 +1,8 @@
 package output
 
 import (
+	"fmt"
+
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 )
 
@@ -54,5 +56,27 @@ func WriteBindingDetails(binding *v1beta1.ServiceBinding) {
 		{"Instance:", binding.Spec.ServiceInstanceRef.Name},
 	})
 
+	t.Render()
+}
+
+// WriteAssociatedBindings prints a list of bindings associated with an instance.
+func WriteAssociatedBindings(bindings []v1beta1.ServiceBinding) {
+	fmt.Println("\nBindings:")
+	if len(bindings) == 0 {
+		fmt.Println("No bindings defined")
+		return
+	}
+
+	t := NewListTable()
+	t.SetHeader([]string{
+		"Name",
+		"Status",
+	})
+	for _, binding := range bindings {
+		t.Append([]string{
+			binding.Name,
+			getBindingStatusShort(binding.Status),
+		})
+	}
 	t.Render()
 }

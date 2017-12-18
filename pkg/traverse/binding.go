@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// BindingToInstance traverses from b to the ServiceInstance that it refers to
+// BindingToInstance retrieves the parent instance for a binding.
 func BindingToInstance(
 	cl *clientset.Clientset,
 	b *v1beta1.ServiceBinding,
@@ -33,7 +33,7 @@ func BindingParentHierarchy(cl *clientset.Clientset, binding *v1beta1.ServiceBin
 		return nil, nil, nil, nil, err
 	}
 
-	broker, err := ServiceClassToBroker(cl, class)
+	broker, err := ClassToBroker(cl, class)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
