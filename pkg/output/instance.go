@@ -61,9 +61,9 @@ func WriteParentInstance(w io.Writer, instance *v1beta1.ServiceInstance) {
 }
 
 // WriteAssociatedInstances prints a list of instances associated with a plan.
-func WriteAssociatedInstances(w io.Writer, instances *v1beta1.ServiceInstanceList) {
+func WriteAssociatedInstances(w io.Writer, instances []v1beta1.ServiceInstance) {
 	fmt.Fprintln(w, "\nInstances:")
-	if len(instances.Items) == 0 {
+	if len(instances) == 0 {
 		fmt.Fprintln(w, "No instances defined")
 		return
 	}
@@ -74,7 +74,7 @@ func WriteAssociatedInstances(w io.Writer, instances *v1beta1.ServiceInstanceLis
 		"Namespace",
 		"Status",
 	})
-	for _, instance := range instances.Items {
+	for _, instance := range instances {
 		t.Append([]string{
 			instance.Name,
 			instance.Namespace,

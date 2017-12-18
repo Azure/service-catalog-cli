@@ -97,9 +97,9 @@ func WritePlanDetails(w io.Writer, plan *v1beta1.ClusterServicePlan, class *v1be
 		{"Name:", plan.Spec.ExternalName},
 		{"Description:", plan.Spec.Description},
 		{"UUID:", string(plan.Name)},
-		{"Class:", class.Spec.ExternalName},
 		{"Status:", getPlanStatusShort(plan.Status)},
 		{"Free:", strconv.FormatBool(plan.Spec.Free)},
+		{"Class:", class.Spec.ExternalName},
 	})
 
 	t.Render()

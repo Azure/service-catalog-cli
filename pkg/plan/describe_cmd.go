@@ -5,10 +5,9 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 )
 
 type describeCmd struct {
@@ -71,22 +70,26 @@ func (c *describeCmd) describe(key string) error {
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := c.Client.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
+	class, err := traverse.PlanToClass(c.Client, plan)
 	if err != nil {
-		return fmt.Errorf("unable to get class (%s)", err)
+		return err
 	}
 
 	output.WritePlanDetails(c.Output, plan, class)
 
+	instances, err := traverse.PlanToInstances(c.Client, plan)
+	if err != nil {
+		return err
+	}
+	output.WriteAssociatedInstances(c.Output, instances)
+
 	if c.traverse {
-		planOpts := v1.ListOptions{
-			FieldSelector: fields.OneTermEqualSelector(fieldServiceClassRef, plan.Name).String(),
-		}
-		instances, err := c.Client.ServicecatalogV1beta1().ServiceInstances("").List(planOpts)
+		broker, err := traverse.ClassToBroker(c.Client, class)
 		if err != nil {
-			return fmt.Errorf("unable to list instances (%s)", err)
+			return err
 		}
-		output.WriteAssociatedInstances(c.Output, instances)
+		output.WriteParentClass(c.Output, class)
+		output.WriteParentBroker(c.Output, broker)
 	}
 
 	return nil

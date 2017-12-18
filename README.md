@@ -9,10 +9,25 @@ resources.
 | 🚨  | Our releases follow [semver](https://semver.org) and the project is in **alpha** status. This means that no assurances are made about backwards compatibility or stability. Before we hit v1.0.0, breaking changes are indicated by bumping the minor version. |
 |---|---|
 
-The goal of the CLI is to provide an easy user interface for Service Catalog users
-to inspect and modify the state of resources in the system.
+`svcat` is a domain-specific tool to make interacting with the Service Catalog easier.
+While many of its commands have analogs to `kubectl`, our goal is to streamline and optimize
+the operator experience, contributing useful code back upstream to Kubernetes where applicable.
+
+`svcat` communicates with the Service Catalog API through the [aggregated API][agg-api] endpoint on a
+Kubernetes cluster.
+
+[agg-api]: https://kubernetes.io/docs/concepts/api-extension/apiserver-aggregation/
+
+# Prerequisites
+In order to use `svcat`, you will need:
+
+* A Kubernetes cluster running v1.7+ or higher
+* A broker compatible with the Open Service Broker API installed on the cluster, such as:
+  * [Open Service Broke for Azure](https://github.com/Azure/helm-charts/tree/master/open-service-broker-azure)
+* The [Service Catalog](https://github.com/kubernetes-incubator/service-catalog/blob/master/docs/install.md) installed on the cluster.
 
 # Install
+Follow the appropriate instructions for your shell to install `svcat`:
 
 ## Bash
 ```bash

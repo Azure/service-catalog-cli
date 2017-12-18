@@ -5,10 +5,9 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 )
 
 type describeCmd struct {
@@ -72,16 +71,19 @@ func (c *describeCmd) describe(key string) error {
 
 	output.WriteClassDetails(c.Output, class)
 
-	if c.traverse {
-		planOpts := v1.ListOptions{
-			FieldSelector: fields.OneTermEqualSelector(fieldServiceClassRef, class.Name).String(),
-		}
-		plans, err := c.Client.ServicecatalogV1beta1().ClusterServicePlans().List(planOpts)
-		if err != nil {
-			return fmt.Errorf("unable to list plans (%s)", err)
-		}
+	plans, err := traverse.ClassToPlans(c.Client, class)
+	if err != nil {
+		return err
+	}
+	output.WriteAssociatedPlans(c.Output, plans)
 
-		output.WriteAssociatedPlans(c.Output, plans.Items)
+	if c.traverse {
+		broker, err := traverse.ClassToBroker(c.Client, class)
+		if err != nil {
+			return err
+		}
+		output.WriteParentBroker(c.Output, broker)
+		output.WriteAssociatedPlans(c.Output, plans)
 	}
 
 	return nil

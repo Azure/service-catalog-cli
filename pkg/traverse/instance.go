@@ -1,13 +1,14 @@
 package traverse
 
 import (
+	"fmt"
+
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// InstanceToServiceClassAndPlan fetches the ClusterServiceClass and
-// ClusterServicePlan for instance, using cl to do the fetches
+// InstanceToServiceClassAndPlan retrieves the parent class and plan for an instance.
 func InstanceToServiceClassAndPlan(
 	cl *clientset.Clientset,
 	instance *v1beta1.ServiceInstance,
@@ -16,7 +17,7 @@ func InstanceToServiceClassAndPlan(
 	classCh := make(chan *v1beta1.ClusterServiceClass)
 	classErrCh := make(chan error)
 	go func() {
-		class, err := cl.Servicecatalog().ClusterServiceClasses().Get(classID, v1.GetOptions{})
+		class, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(classID, v1.GetOptions{})
 		if err != nil {
 			classErrCh <- err
 			return
@@ -28,7 +29,7 @@ func InstanceToServiceClassAndPlan(
 	planCh := make(chan *v1beta1.ClusterServicePlan)
 	planErrCh := make(chan error)
 	go func() {
-		plan, err := cl.Servicecatalog().ClusterServicePlans().Get(planID, v1.GetOptions{})
+		plan, err := cl.ServicecatalogV1beta1().ClusterServicePlans().Get(planID, v1.GetOptions{})
 		if err != nil {
 			planErrCh <- err
 			return
@@ -67,10 +68,29 @@ func InstanceParentHierarchy(cl *clientset.Clientset, instance *v1beta1.ServiceI
 		return nil, nil, nil, err
 	}
 
-	broker, err := ServiceClassToBroker(cl, class)
+	broker, err := ClassToBroker(cl, class)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
 	return class, plan, broker, nil
+}
+
+// InstanceToBindings retrieves all child bindings for an instance.
+func InstanceToBindings(cl *clientset.Clientset, instance *v1beta1.ServiceInstance,
+) ([]v1beta1.ServiceBinding, error) {
+	// Not using a filtered list operation because it's not supported yet.
+	results, err := cl.ServicecatalogV1beta1().ServiceBindings(instance.Namespace).List(v1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to search bindings (%s)", err)
+	}
+
+	var bindings []v1beta1.ServiceBinding
+	for _, binding := range results.Items {
+		if binding.Spec.ServiceInstanceRef.Name == instance.Name {
+			bindings = append(bindings, binding)
+		}
+	}
+
+	return bindings, nil
 }
