@@ -53,6 +53,7 @@ func WriteClassDetails(class *v1beta1.ClusterServiceClass) {
 		{"UUID:", string(class.Name)},
 		{"Status:", getClassStatusText(class.Status)},
 		{"Tags:", strings.Join(class.Spec.Tags, ", ")},
+		{"Broker:", class.Spec.ClusterServiceBrokerName},
 	})
 	t.Render()
 }
