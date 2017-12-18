@@ -60,7 +60,6 @@ workflows:
       - test:
           requires:
             - hold
-            - build
           filters:
             branches:
               ignore: master
@@ -75,8 +74,6 @@ workflows:
             branches:
               only: master
       - test:
-          requires:
-            - build
           filters:
             branches:
               only: master
@@ -95,8 +92,6 @@ workflows:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
       - test:
-          requires:
-            - build
           filters:
             branches:
               # this is a hack, because ignore seems to block all PR builds
@@ -107,6 +102,7 @@ workflows:
       - deploy: # Only deploy tagged releases
           requires:
             - verify-vendor
+            - build
             - test
           filters:
             branches:
