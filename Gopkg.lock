@@ -166,12 +166,14 @@
 [[projects]]
   name = "github.com/spf13/cobra"
   packages = ["."]
-  revision = "f62e98d28ab7ad31d707ba837a966378465c7b57"
+  revision = "7b2c5ac9fc04fc5efafb60700713d4fa609b777b"
+  version = "v0.0.1"
 
 [[projects]]
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "9ff6c6923cfffbcd502984b8e0c80539a94968b7"
+  revision = "e57e3eeb33f795204c1ca35f56c44f83227c6e66"
+  version = "v1.0.0"
 
 [[projects]]
   name = "golang.org/x/crypto"
@@ -230,6 +232,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a77c8dce752f3103cd264a0e7cc806b3e18e13442f7c4aa7b5ee370f033e0925"
+  inputs-digest = "cb95d449bf541ac0cb182718a309083ad7be9b887fc2ac353f75e9ec5e57def5"
   solver-name = "gps-cdcl"
   solver-version = 1
