@@ -67,3 +67,12 @@ func provision(cl *clientset.Clientset, namespace, instanceName, className, plan
 	}
 	return result, nil
 }
+
+func deprovision(cl *clientset.Clientset, namespace, instanceName string) error {
+	err := cl.ServicecatalogV1beta1().ServiceInstances(namespace).Delete(instanceName, &v1.DeleteOptions{})
+	if err != nil {
+		return fmt.Errorf("deprovision request failed (%s)", err)
+	}
+	return nil
+}
+
