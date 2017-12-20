@@ -16,12 +16,12 @@ func getBindingStatusCondition(status v1beta1.ServiceBindingStatus) v1beta1.Serv
 
 func getBindingStatusShort(status v1beta1.ServiceBindingStatus) string {
 	lastCond := getBindingStatusCondition(status)
-	return string(lastCond.Type)
+	return formatStatusShort(string(lastCond.Type), lastCond.Status, lastCond.Reason)
 }
 
 func getBindingStatusFull(status v1beta1.ServiceBindingStatus) string {
 	lastCond := getBindingStatusCondition(status)
-	return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+	return formatStatusFull(string(lastCond.Type), lastCond.Status, lastCond.Reason, lastCond.Message, lastCond.LastTransitionTime)
 }
 
 // WriteBindingDetails prints a list of bindings.

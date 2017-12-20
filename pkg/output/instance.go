@@ -16,12 +16,12 @@ func getInstanceStatusCondition(status v1beta1.ServiceInstanceStatus) v1beta1.Se
 
 func getInstanceStatusFull(status v1beta1.ServiceInstanceStatus) string {
 	lastCond := getInstanceStatusCondition(status)
-	return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+	return formatStatusFull(string(lastCond.Type), lastCond.Status, lastCond.Reason, lastCond.Message, lastCond.LastTransitionTime)
 }
 
 func getInstanceStatusShort(status v1beta1.ServiceInstanceStatus) string {
 	lastCond := getInstanceStatusCondition(status)
-	return string(lastCond.Type)
+	return formatStatusShort(string(lastCond.Type), lastCond.Status, lastCond.Reason)
 }
 
 // WriteInstanceList prints a list of instances.

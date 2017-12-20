@@ -16,12 +16,12 @@ func getBrokerStatusCondition(status v1beta1.ClusterServiceBrokerStatus) v1beta1
 
 func getBrokerStatusShort(status v1beta1.ClusterServiceBrokerStatus) string {
 	lastCond := getBrokerStatusCondition(status)
-	return string(lastCond.Type)
+	return formatStatusShort(string(lastCond.Type), lastCond.Status, lastCond.Reason)
 }
 
 func getBrokerStatusFull(status v1beta1.ClusterServiceBrokerStatus) string {
 	lastCond := getBrokerStatusCondition(status)
-	return formatStatusText(string(lastCond.Type), lastCond.Message, lastCond.LastTransitionTime)
+	return formatStatusFull(string(lastCond.Type), lastCond.Status, lastCond.Reason, lastCond.Message, lastCond.LastTransitionTime)
 }
 
 // WriteBrokerList prints a list of brokers.

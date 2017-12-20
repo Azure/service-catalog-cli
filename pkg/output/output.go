@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -12,10 +13,15 @@ const (
 	statusDeprecated = "Deprecated"
 )
 
-func formatStatusText(status, message string, timestamp v1.Time) string {
-	if status == "" {
-		return ""
+func formatStatusShort(condition string, conditionStatus v1beta1.ConditionStatus, reason string) string {
+	if conditionStatus == v1beta1.ConditionTrue {
+		return condition
 	}
+	return reason
+}
+
+func formatStatusFull(condition string, conditionStatus v1beta1.ConditionStatus, reason string, message string, timestamp v1.Time) string {
+	status := formatStatusShort(condition, conditionStatus, reason)
 	message = strings.TrimRight(message, ".")
 	return fmt.Sprintf("%s - %s @ %s", status, message, timestamp)
 }

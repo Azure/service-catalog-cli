@@ -2,11 +2,11 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -24,7 +24,10 @@ func TestCommandOutput(t *testing.T) {
 		cmd    string // Command to run
 		golden string // Relative path to a golden file, compared to the command output
 	}{
-		{"list all brokers", "get brokers", "get-brokers.txt"},
+		{"list all brokers", "get brokers", "output/get-brokers.txt"},
+		{"list all instances", "get instances", "output/get-instances.txt"},
+		{"get instance", "get instance quickstart-wordpress-mysql-instance",
+			"output/get-instance-quickstart-wordpress-mysql-instance.txt"},
 	}
 
 	for _, tc := range testcases {
@@ -41,7 +44,7 @@ func TestCommandOutput(t *testing.T) {
 // returning the cli output.
 func executeCommand(t *testing.T, cmd string) string {
 	// Fake the k8s api server
-	apisvr := newAPIServer()
+	apisvr := newAPIServer(t)
 	defer apisvr.Close()
 
 	// Generate a test kubeconfig pointing at the server
@@ -67,22 +70,23 @@ func executeCommand(t *testing.T, cmd string) string {
 	return output.String()
 }
 
-func newAPIServer() *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(apihandler))
+func newAPIServer(t *testing.T) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apihandler(t, w, r)
+	}))
 }
 
 // apihandler handles requests to the service catalog endpoint.
 // When a request is received, it looks up the response from the testdata directory.
 // Example:
 // GET /apis/servicecatalog.k8s.io/v1beta1/clusterservicebrokers responds with testdata/clusterservicebrokers.json
-func apihandler(w http.ResponseWriter, r *http.Request) {
+func apihandler(t *testing.T, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	match := catalogRequestRegex.FindStringSubmatch(r.RequestURI)
 
 	if len(match) == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintln(w, "unexpected request: "+r.RequestURI)
+		t.Fatalf("unexpected request %s", r.RequestURI)
 		return
 	}
 
@@ -93,12 +97,12 @@ func apihandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, response, err := test.GetTestdata(match[1] + ".json")
+	_, response, err := test.GetTestdata(filepath.Join("responses", match[1]+".json"))
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%v", err)
+		t.Fatalf("unexpected request %s with no matching testdata (%s)", r.RequestURI, err)
 		return
 	}
+
 	w.Write(response)
 }
 
