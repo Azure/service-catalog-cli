@@ -25,6 +25,9 @@ func TestCommandOutput(t *testing.T) {
 		golden string // Relative path to a golden file, compared to the command output
 	}{
 		{"list all brokers", "get brokers", "output/get-brokers.txt"},
+		{"list all instances", "get instances", "output/get-instances.txt"},
+		{"get instance", "get instance quickstart-wordpress-mysql-instance",
+			"output/get-instance-quickstart-wordpress-mysql-instance.txt"},
 	}
 
 	for _, tc := range testcases {
