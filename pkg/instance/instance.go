@@ -12,7 +12,7 @@ import (
 func retrieveAll(cl *clientset.Clientset, ns string) (*v1beta1.ServiceInstanceList, error) {
 	instances, err := cl.ServicecatalogV1beta1().ServiceInstances(ns).List(v1.ListOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("Error listing instances (%s)", err)
+		return nil, fmt.Errorf("unable to list instances in %s (%s)", ns, err)
 	}
 
 	return instances, nil
