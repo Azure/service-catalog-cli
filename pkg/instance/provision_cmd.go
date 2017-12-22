@@ -47,18 +47,18 @@ func (c *provisonCmd) run(args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("name is required")
 	}
+	name := args[0]
 
-	key := args[0]
-	return c.provision(key)
-}
-
-func (c *provisonCmd) provision(instanceName string) error {
 	params, err := params.ParseVariableAssignments(c.params)
 	if err != nil {
 		return fmt.Errorf("invalid --param value (%s)", err)
 	}
 
-	instance, err := provision(c.Client, c.ns, instanceName, c.className, c.planName, params)
+	return c.provision(name, params)
+}
+
+func (c *provisonCmd) provision(name string, params map[string]string) error {
+	instance, err := provision(c.Client, c.ns, name, c.className, c.planName, params)
 	if err != nil {
 		return err
 	}
