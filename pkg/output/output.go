@@ -22,6 +22,9 @@ func formatStatusShort(condition string, conditionStatus v1beta1.ConditionStatus
 
 func formatStatusFull(condition string, conditionStatus v1beta1.ConditionStatus, reason string, message string, timestamp v1.Time) string {
 	status := formatStatusShort(condition, conditionStatus, reason)
+	if status == "" {
+		return ""
+	}
 	message = strings.TrimRight(message, ".")
 	return fmt.Sprintf("%s - %s @ %s", status, message, timestamp)
 }
