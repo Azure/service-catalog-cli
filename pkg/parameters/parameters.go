@@ -1,4 +1,4 @@
-package params
+package parameters
 
 import (
 	"fmt"

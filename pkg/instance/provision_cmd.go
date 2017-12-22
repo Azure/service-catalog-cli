@@ -5,7 +5,7 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
-	"github.com/Azure/service-catalog-cli/pkg/params"
+	"github.com/Azure/service-catalog-cli/pkg/parameters"
 	"github.com/spf13/cobra"
 )
 
@@ -49,7 +49,7 @@ func (c *provisonCmd) run(args []string) error {
 	}
 	name := args[0]
 
-	params, err := params.ParseVariableAssignments(c.params)
+	params, err := parameters.ParseVariableAssignments(c.params)
 	if err != nil {
 		return fmt.Errorf("invalid --param value (%s)", err)
 	}
