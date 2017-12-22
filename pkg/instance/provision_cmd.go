@@ -63,11 +63,6 @@ func (c *provisonCmd) provision(instanceName string) error {
 		return err
 	}
 
-	instance, err = waitForStatus(c.Client, instance)
-	if err != nil {
-		return err
-	}
-
 	output.WriteInstanceDetails(c.Output, instance)
 
 	return nil
