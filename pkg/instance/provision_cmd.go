@@ -15,6 +15,7 @@ type provisonCmd struct {
 	className string
 	planName  string
 	params    []string
+	secrets   []string
 }
 
 // NewProvisionCmd builds a "svcat provision" command
@@ -25,6 +26,7 @@ func NewProvisionCmd(cxt *command.Context) *cobra.Command {
 		Short: "Create a new instance of a service",
 		Example: `
   svcat provision wordpress-mysql-instance --class azure-mysqldb --plan standard800 -p location=eastus -p sslEnforcement=disabled
+  svcat provision wordpress-mysql-instance --class azure-mysqldb --plan standard800 -s mysecret[dbparams]
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return provisionCmd.run(args)
@@ -38,8 +40,10 @@ func NewProvisionCmd(cxt *command.Context) *cobra.Command {
 	cmd.Flags().StringVar(&provisionCmd.planName, "plan", "",
 		"The plan name")
 	cmd.MarkFlagRequired("plan")
-	cmd.Flags().StringArrayVarP(&provisionCmd.params, "params", "p", nil,
-		"Additional parameters to use when provisioning the service")
+	cmd.Flags().StringArrayVarP(&provisionCmd.params, "param", "p", nil,
+		"Additional parameter to use when provisioning the service, format: NAME=VALUE")
+	cmd.Flags().StringArrayVarP(&provisionCmd.secrets, "secret", "s", nil,
+		"Additional parameter, whose value is stored in a secret, to use when provisioning the service, format: SECRET[KEY]")
 	return cmd
 }
 
@@ -54,11 +58,16 @@ func (c *provisonCmd) run(args []string) error {
 		return fmt.Errorf("invalid --param value (%s)", err)
 	}
 
-	return c.provision(name, params)
+	secrets, err := parameters.ParseKeyMaps(c.secrets)
+	if err != nil {
+		return fmt.Errorf("invalid --secret value (%s)", err)
+	}
+
+	return c.provision(name, params, secrets)
 }
 
-func (c *provisonCmd) provision(name string, params map[string]string) error {
-	instance, err := provision(c.Client, c.ns, name, c.className, c.planName, params)
+func (c *provisonCmd) provision(name string, params map[string]string, secrets map[string]string) error {
+	instance, err := provision(c.Client, c.ns, name, c.className, c.planName, params, secrets)
 	if err != nil {
 		return err
 	}

@@ -27,8 +27,8 @@ func retrieveByName(cl *clientset.Clientset, ns, name string) (*v1beta1.ServiceI
 	return instance, nil
 }
 
-func provision(cl *clientset.Clientset, namespace, instanceName, className, planName string, params map[string]string,
-) (*v1beta1.ServiceInstance, error) {
+func provision(cl *clientset.Clientset, namespace, instanceName, className, planName string,
+	params map[string]string, secrets map[string]string) (*v1beta1.ServiceInstance, error) {
 	paramsJson, err := json.Marshal(params)
 	if err != nil {
 		return nil, fmt.Errorf("unable to marshal the request parameters %v (%s)", params, err)
@@ -47,7 +47,18 @@ func provision(cl *clientset.Clientset, namespace, instanceName, className, plan
 			Parameters: &runtime.RawExtension{
 				Raw: paramsJson,
 			},
+			ParametersFrom: make([]v1beta1.ParametersFromSource, 0, len(secrets)),
 		},
+	}
+
+	for secret, key := range secrets {
+		pf := v1beta1.ParametersFromSource{
+			SecretKeyRef: &v1beta1.SecretKeyReference{
+				Name: secret,
+				Key:  key,
+			},
+		}
+		request.Spec.ParametersFrom = append(request.Spec.ParametersFrom, pf)
 	}
 
 	result, err := cl.ServicecatalogV1beta1().ServiceInstances(namespace).Create(request)
