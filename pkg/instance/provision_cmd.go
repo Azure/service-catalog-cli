@@ -22,7 +22,7 @@ type provisonCmd struct {
 func NewProvisionCmd(cxt *command.Context) *cobra.Command {
 	provisionCmd := &provisonCmd{Context: cxt}
 	cmd := &cobra.Command{
-		Use:   "provision NAME",
+		Use:   "provision NAME --plan PLAN --class CLASS",
 		Short: "Create a new instance of a service",
 		Example: `
   svcat provision wordpress-mysql-instance --class azure-mysqldb --plan standard800 -p location=eastus -p sslEnforcement=disabled
@@ -35,10 +35,10 @@ func NewProvisionCmd(cxt *command.Context) *cobra.Command {
 	cmd.Flags().StringVarP(&provisionCmd.ns, "namespace", "n", "default",
 		"The namespace in which to create the instance")
 	cmd.Flags().StringVar(&provisionCmd.className, "class", "",
-		"The class name")
+		"The class name (Required)")
 	cmd.MarkFlagRequired("class")
 	cmd.Flags().StringVar(&provisionCmd.planName, "plan", "",
-		"The plan name")
+		"The plan name (Required)")
 	cmd.MarkFlagRequired("plan")
 	cmd.Flags().StringArrayVarP(&provisionCmd.params, "param", "p", nil,
 		"Additional parameter to use when provisioning the service, format: NAME=VALUE")
