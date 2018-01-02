@@ -9,7 +9,7 @@ UPDATE_GOLDEN ?= false
 GOPATH = $(shell go env GOPATH)
 
 build:
-	$(GOBUILD) -o bin/svcat ./cmd/svcat
+	$(GOBUILD) -i -o bin/svcat ./cmd/svcat
 
 linux:
 	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(RELEASE_DIR)/Linux/x86_64/svcat ./cmd/svcat
