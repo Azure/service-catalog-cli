@@ -167,6 +167,20 @@ $ svcat get bindings --namespace cms
   ponycms-wordpress-mysql-binding    cms         ponycms-wordpress-mysql-instance    Ready
 ```
 
+## Bind an instance
+
+```console
+$ svcat bind quickstart-wordpress-mysql-instance
+    --name quickstart-wordpress-mysql-binding \
+    --secret-name quickstart-wordpress-secret
+```
+
+When omitted, the names of the binding and secret are defaulted to the name of the instance.
+
+```console
+$ svcat bind wordpress-mysql
+```
+
 ## View the details of a service instance
 
 ```console
