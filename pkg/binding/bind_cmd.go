@@ -68,6 +68,12 @@ func (c *bindCmd) run(args []string) error {
 	}
 	c.instanceName = args[0]
 
+	// Manually defaulting the name of the binding
+	// I'm not doing the same for the secret since the API handles defaulting that value.
+	if c.bindingName == "" {
+		c.bindingName = c.instanceName
+	}
+
 	params, err := parameters.ParseVariableAssignments(c.params)
 	if err != nil {
 		return fmt.Errorf("invalid --param value (%s)", err)
