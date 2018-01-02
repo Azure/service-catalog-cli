@@ -3,6 +3,8 @@ package parameters
 import (
 	"reflect"
 	"testing"
+
+	_ "github.com/Azure/service-catalog-cli/internal/test"
 )
 
 func TestParseVariableAssignments(t *testing.T) {
