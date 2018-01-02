@@ -1,13 +1,12 @@
 package instance
 
 import (
-	"encoding/json"
 	"fmt"
 
+	"github.com/Azure/service-catalog-cli/pkg/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
 func retrieveAll(cl *clientset.Clientset, ns string) (*v1beta1.ServiceInstanceList, error) {
@@ -29,10 +28,6 @@ func retrieveByName(cl *clientset.Clientset, ns, name string) (*v1beta1.ServiceI
 
 func provision(cl *clientset.Clientset, namespace, instanceName, className, planName string,
 	params map[string]string, secrets map[string]string) (*v1beta1.ServiceInstance, error) {
-	paramsJson, err := json.Marshal(params)
-	if err != nil {
-		return nil, fmt.Errorf("unable to marshal the request parameters %v (%s)", params, err)
-	}
 
 	request := &v1beta1.ServiceInstance{
 		ObjectMeta: v1.ObjectMeta{
@@ -44,21 +39,9 @@ func provision(cl *clientset.Clientset, namespace, instanceName, className, plan
 				ClusterServiceClassExternalName: className,
 				ClusterServicePlanExternalName:  planName,
 			},
-			Parameters: &runtime.RawExtension{
-				Raw: paramsJson,
-			},
-			ParametersFrom: make([]v1beta1.ParametersFromSource, 0, len(secrets)),
+			Parameters:     client.BuildParameters(params),
+			ParametersFrom: client.BuildParametersFrom(secrets),
 		},
-	}
-
-	for secret, key := range secrets {
-		pf := v1beta1.ParametersFromSource{
-			SecretKeyRef: &v1beta1.SecretKeyReference{
-				Name: secret,
-				Key:  key,
-			},
-		}
-		request.Spec.ParametersFrom = append(request.Spec.ParametersFrom, pf)
 	}
 
 	result, err := cl.ServicecatalogV1beta1().ServiceInstances(namespace).Create(request)
