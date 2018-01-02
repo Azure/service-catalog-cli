@@ -63,7 +63,7 @@ func (c *describeCmd) describe(key string) error {
 	if c.lookupByUUID {
 		class, err = retrieveByUUID(c.Client, key)
 	} else {
-		class, err = retrieveByName(c.Client, key)
+		class, err = RetrieveByName(c.Client, key)
 	}
 	if err != nil {
 		return err
