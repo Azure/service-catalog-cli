@@ -134,6 +134,9 @@ Plans:
 $ svcat provision quickstart-wordpress-mysql-instance \
     --class azure-mysqldb --plan standard800 \
     -p location=eastus -p resourceGroup=default
+    -p sslEnforcement=disabled \
+    -p firewallStartIPAddress=0.0.0.0 \
+    -p firewallEndIPAddress=255.255.255.255
 ```
 
 ## View all instances of a service plan on the cluster
