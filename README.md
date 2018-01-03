@@ -189,6 +189,16 @@ Broker:
   Status:   Ready
 ```
 
+## Unbind all applications from an instance
+```console
+$ svcat unbind ponycms-wordpress-mysql-instance
+```
+
+## Unbind a single application from an instance
+```console
+$ svcat unbind --name ponycms-wordpress-mysql-binding
+```
+
 # Contributing
 
 For details on how to contribute to this project, please see
