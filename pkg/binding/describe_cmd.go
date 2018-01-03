@@ -50,9 +50,9 @@ func (c *describeCmd) run(args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("name is required")
 	}
+	name := args[0]
 
-	key := args[0]
-	return c.describe(key)
+	return c.describe(name)
 }
 
 func (c *describeCmd) describe(name string) error {

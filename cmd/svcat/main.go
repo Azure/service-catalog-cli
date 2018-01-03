@@ -76,6 +76,7 @@ func buildRootCommand() *cobra.Command {
 	cmd.AddCommand(newDescribeCmd(cxt))
 	cmd.AddCommand(instance.NewProvisionCmd(cxt))
 	cmd.AddCommand(instance.NewDeprovisionCmd(cxt))
+	cmd.AddCommand(binding.NewBindCmd(cxt))
 	cmd.AddCommand(newSyncCmd(cxt))
 
 	return cmd
