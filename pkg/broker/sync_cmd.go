@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type syncCmd struct {
@@ -36,23 +35,11 @@ func (c *syncCmd) run(args []string) error {
 
 func (c *syncCmd) sync(name string) error {
 	const retries = 3
-	for j := 0; j < retries; j++ {
-		catalog, err := c.Client.ServicecatalogV1beta1().ClusterServiceBrokers().Get(name, v1.GetOptions{})
-		if err != nil {
-			return fmt.Errorf("Error fetching ClusterServiceBrokers (%s)", err)
-		}
-
-		catalog.Spec.RelistRequests = catalog.Spec.RelistRequests + 1
-
-		_, err = c.Client.ServicecatalogV1beta1().ClusterServiceBrokers().Update(catalog)
-		if err == nil {
-			fmt.Fprintf(c.Output, "Successfully fetched catalog entries from %s broker", name)
-			return nil
-		}
-		if !errors.IsConflict(err) {
-			return err
-		}
-		fmt.Fprintf(c.Output, "Conflict when syncing service broker, retries left: %v", retries-j)
+	err := client.Sync(c.Client, name, retries)
+	if err != nil {
+		return err
 	}
-	return fmt.Errorf("Failed to sync service broker")
+
+	fmt.Fprintf(c.Output, "Successfully fetched catalog entries from %s broker", name)
+	return nil
 }

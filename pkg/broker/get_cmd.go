@@ -1,13 +1,10 @@
 package broker
 
 import (
-	"fmt"
-
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type getCmd struct {
@@ -43,12 +40,12 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	brokers, err := c.Client.ServicecatalogV1beta1().ClusterServiceBrokers().List(v1.ListOptions{})
+	brokers, err := client.RetrieveBrokers(c.Client)
 	if err != nil {
-		return fmt.Errorf("Error listing brokers (%s)", err)
+		return err
 	}
 
-	output.WriteBrokerList(c.Output, brokers.Items...)
+	output.WriteBrokerList(c.Output, brokers...)
 	return nil
 }
 
