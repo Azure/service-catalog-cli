@@ -1,8 +1,8 @@
 package binding
 
 import (
-	"github.com/Azure/service-catalog-cli/pkg/command"
-	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
+	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
 	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
