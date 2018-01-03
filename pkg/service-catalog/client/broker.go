@@ -1,4 +1,4 @@
-package broker
+package client
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func retrieveByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServiceBroker, error) {
+func RetrieveBroker(cl *clientset.Clientset, name string) (*v1beta1.ClusterServiceBroker, error) {
 	broker, err := cl.ServicecatalogV1beta1().ClusterServiceBrokers().Get(name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get broker '%s' (%s)", name, err)

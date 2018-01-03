@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -52,7 +53,7 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get(name string) error {
-	broker, err := retrieveByName(c.Client, name)
+	broker, err := client.RetrieveBroker(c.Client, name)
 	if err != nil {
 		return err
 	}
