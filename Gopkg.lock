@@ -90,6 +90,18 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/hashicorp/errwrap"
+  packages = ["."]
+  revision = "7554cd9344cec97297fa6649b055a8c98c2a1e55"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-multierror"
+  packages = ["."]
+  revision = "b7773ae218740a7be65057fc60b366a49b538a44"
+
+[[projects]]
+  branch = "master"
   name = "github.com/howeyc/gopass"
   packages = ["."]
   revision = "bf9dde6d0d2c004a008c27aaee91170c786f6db8"
@@ -232,6 +244,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cb95d449bf541ac0cb182718a309083ad7be9b887fc2ac353f75e9ec5e57def5"
+  inputs-digest = "c81d22061c89dd8fdbb80da53bdb88f23cb4dd41ba4e0f465f715d44192a2c78"
   solver-name = "gps-cdcl"
   solver-version = 1
