@@ -206,6 +206,13 @@ Broker:
   Status:   Ready
 ```
 
+## Delete a service instance
+Deprovisioning is the process of preparing an instance to be removed, and then deleting it.
+
+```console
+$ svcat deprovision ponycms-wordpress-mysql-instance
+```
+
 # Contributing
 
 For details on how to contribute to this project, please see
