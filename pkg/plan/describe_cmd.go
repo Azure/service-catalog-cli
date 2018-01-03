@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
@@ -61,9 +62,9 @@ func (c *describeCmd) describe(key string) error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = retrieveByUUID(c.Client, key)
+		plan, err = client.RetrievePlanByID(c.Client, key)
 	} else {
-		plan, err = RetrieveByName(c.Client, key)
+		plan, err = client.RetrievePlanByName(c.Client, key)
 	}
 	if err != nil {
 		return err

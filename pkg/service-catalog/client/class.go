@@ -10,13 +10,21 @@ import (
 )
 
 const (
-	fieldExternalName    = "spec.externalName"
-	fieldServiceClassRef = "spec.clusterServiceClassRef.name"
+	FieldExternalClassName = "spec.externalName"
 )
+
+func RetrieveClasses(cl *clientset.Clientset) ([]v1beta1.ClusterServiceClass, error) {
+	classes, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to list classes (%s)", err)
+	}
+
+	return classes.Items, nil
+}
 
 func RetrieveClassByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServiceClass, error) {
 	opts := v1.ListOptions{
-		FieldSelector: fields.OneTermEqualSelector(fieldExternalName, name).String(),
+		FieldSelector: fields.OneTermEqualSelector(FieldExternalClassName, name).String(),
 	}
 	searchResults, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().List(opts)
 	if err != nil {

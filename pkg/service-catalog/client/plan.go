@@ -1,4 +1,4 @@
-package plan
+package client
 
 import (
 	"fmt"
@@ -10,12 +10,21 @@ import (
 )
 
 const (
-	fieldExternalName = "spec.externalName"
+	FieldExternalPlanName = "spec.externalName"
 )
 
-func RetrieveByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServicePlan, error) {
+func RetrievePlans(cl *clientset.Clientset) ([]v1beta1.ClusterServicePlan, error) {
+	plans, err := cl.ServicecatalogV1beta1().ClusterServicePlans().List(v1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to list plans (%s)", err)
+	}
+
+	return plans.Items, nil
+}
+
+func RetrievePlanByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServicePlan, error) {
 	opts := v1.ListOptions{
-		FieldSelector: fields.OneTermEqualSelector(fieldExternalName, name).String(),
+		FieldSelector: fields.OneTermEqualSelector(FieldExternalPlanName, name).String(),
 	}
 	searchResults, err := cl.ServicecatalogV1beta1().ClusterServicePlans().List(opts)
 	if err != nil {
@@ -30,7 +39,7 @@ func RetrieveByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServi
 	return &searchResults.Items[0], nil
 }
 
-func retrieveByUUID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterServicePlan, error) {
+func RetrievePlanByID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterServicePlan, error) {
 	plan, err := cl.ServicecatalogV1beta1().ClusterServicePlans().Get(uuid, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get plan by uuid '%s' (%s)", uuid, err)
