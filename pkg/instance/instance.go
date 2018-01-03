@@ -3,7 +3,7 @@ package instance
 import (
 	"fmt"
 
-	"github.com/Azure/service-catalog-cli/pkg/client"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -58,4 +58,3 @@ func deprovision(cl *clientset.Clientset, namespace, instanceName string) error 
 	}
 	return nil
 }
-
