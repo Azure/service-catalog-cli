@@ -5,9 +5,9 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type getCmd struct {
@@ -51,12 +51,12 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	classes, err := c.Client.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
+	classes, err := client.RetrieveClasses(c.Client)
 	if err != nil {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
 
-	output.WriteClassList(c.Output, classes.Items...)
+	output.WriteClassList(c.Output, classes...)
 	return nil
 }
 
@@ -64,9 +64,9 @@ func (c *getCmd) get(key string) error {
 	var class *v1beta1.ClusterServiceClass
 	var err error
 	if c.lookupByUUID {
-		class, err = retrieveByUUID(c.Client, key)
+		class, err = client.RetrieveClassByID(c.Client, key)
 	} else {
-		class, err = RetrieveByName(c.Client, key)
+		class, err = client.RetrieveClassByName(c.Client, key)
 	}
 	if err != nil {
 		return err

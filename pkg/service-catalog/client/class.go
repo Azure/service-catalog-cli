@@ -1,4 +1,4 @@
-package class
+package client
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ const (
 	fieldServiceClassRef = "spec.clusterServiceClassRef.name"
 )
 
-func RetrieveByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServiceClass, error) {
+func RetrieveClassByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServiceClass, error) {
 	opts := v1.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(fieldExternalName, name).String(),
 	}
@@ -31,7 +31,7 @@ func RetrieveByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServi
 	return &searchResults.Items[0], nil
 }
 
-func retrieveByUUID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterServiceClass, error) {
+func RetrieveClassByID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterServiceClass, error) {
 	class, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(uuid, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get class (%s)", err)
