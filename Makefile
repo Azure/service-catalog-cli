@@ -6,9 +6,10 @@ LDFLAGS = -w -X main.commit=$(COMMIT) -X main.version=$(VERSION)
 GOBUILD = CGO_ENABLED=0 go build -a -tags netgo -ldflags '$(LDFLAGS)'
 RELEASE_DIR = bin/$(VERSION)
 UPDATE_GOLDEN ?= false
+GOPATH = $(shell go env GOPATH)
 
 build:
-	$(GOBUILD) -o bin/svcat ./cmd/svcat
+	$(GOBUILD) -i -o bin/svcat ./cmd/svcat
 
 linux:
 	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(RELEASE_DIR)/Linux/x86_64/svcat ./cmd/svcat
@@ -35,7 +36,7 @@ check-dep:
 get-dep:
 	# Install the latest release of dep
 	go get -d -u github.com/golang/dep
-	cd $$(go env GOPATH)/src/github.com/golang/dep && \
+	cd $(GOPATH)/src/github.com/golang/dep && \
 	DEP_TAG=$$(git describe --abbrev=0 --tags) && \
 	git checkout $$DEP_TAG && \
 	go install -ldflags="-X main.version=$$DEP_TAG" ./cmd/dep; \
@@ -52,6 +53,9 @@ verify-vendor: check-dep
 
 test:
 	go test ./... --update=$(UPDATE_GOLDEN)
+
+install: build
+	cp ./bin/svcat $(GOPATH)/bin/
 
 deploy: clean cross-build
 	cp -R $(RELEASE_DIR) bin/latest/
