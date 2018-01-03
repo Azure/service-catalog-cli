@@ -1,15 +1,14 @@
-package instance
+package client
 
 import (
 	"fmt"
 
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func retrieveAll(cl *clientset.Clientset, ns string) (*v1beta1.ServiceInstanceList, error) {
+func RetrieveInstances(cl *clientset.Clientset, ns string) (*v1beta1.ServiceInstanceList, error) {
 	instances, err := cl.ServicecatalogV1beta1().ServiceInstances(ns).List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list instances in %s (%s)", ns, err)
@@ -18,7 +17,7 @@ func retrieveAll(cl *clientset.Clientset, ns string) (*v1beta1.ServiceInstanceLi
 	return instances, nil
 }
 
-func retrieveByName(cl *clientset.Clientset, ns, name string) (*v1beta1.ServiceInstance, error) {
+func RetrieveInstance(cl *clientset.Clientset, ns, name string) (*v1beta1.ServiceInstance, error) {
 	instance, err := cl.ServicecatalogV1beta1().ServiceInstances(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get instance '%s.%s' (%s)", ns, name, err)
@@ -26,7 +25,7 @@ func retrieveByName(cl *clientset.Clientset, ns, name string) (*v1beta1.ServiceI
 	return instance, nil
 }
 
-func provision(cl *clientset.Clientset, namespace, instanceName, className, planName string,
+func Provision(cl *clientset.Clientset, namespace, instanceName, className, planName string,
 	params map[string]string, secrets map[string]string) (*v1beta1.ServiceInstance, error) {
 
 	request := &v1beta1.ServiceInstance{
@@ -39,8 +38,8 @@ func provision(cl *clientset.Clientset, namespace, instanceName, className, plan
 				ClusterServiceClassExternalName: className,
 				ClusterServicePlanExternalName:  planName,
 			},
-			Parameters:     client.BuildParameters(params),
-			ParametersFrom: client.BuildParametersFrom(secrets),
+			Parameters:     BuildParameters(params),
+			ParametersFrom: BuildParametersFrom(secrets),
 		},
 	}
 
@@ -51,7 +50,7 @@ func provision(cl *clientset.Clientset, namespace, instanceName, className, plan
 	return result, nil
 }
 
-func deprovision(cl *clientset.Clientset, namespace, instanceName string) error {
+func Deprovision(cl *clientset.Clientset, namespace, instanceName string) error {
 	err := cl.ServicecatalogV1beta1().ServiceInstances(namespace).Delete(instanceName, &v1.DeleteOptions{})
 	if err != nil {
 		return fmt.Errorf("deprovision request failed (%s)", err)

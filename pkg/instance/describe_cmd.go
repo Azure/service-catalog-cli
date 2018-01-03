@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/spf13/cobra"
 )
@@ -56,7 +57,7 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe(name string) error {
-	instance, err := retrieveByName(c.Client, c.ns, name)
+	instance, err := client.RetrieveInstance(c.Client, c.ns, name)
 	if err != nil {
 		return err
 	}

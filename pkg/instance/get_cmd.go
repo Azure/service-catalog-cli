@@ -3,6 +3,7 @@ package instance
 import (
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -47,7 +48,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	instances, err := retrieveAll(c.Client, c.ns)
+	instances, err := client.RetrieveInstances(c.Client, c.ns)
 	if err != nil {
 		return err
 	}
@@ -57,7 +58,7 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get(name string) error {
-	instance, err := retrieveByName(c.Client, c.ns, name)
+	instance, err := client.RetrieveInstance(c.Client, c.ns, name)
 	if err != nil {
 		return err
 	}
