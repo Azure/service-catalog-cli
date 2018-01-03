@@ -1,8 +1,6 @@
 package class
 
 import (
-	"fmt"
-
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
@@ -13,6 +11,8 @@ import (
 type getCmd struct {
 	*command.Context
 	lookupByUUID bool
+	uuid         string
+	name         string
 }
 
 // NewGetCmd builds a "svcat get classes" command
@@ -44,29 +44,35 @@ func NewGetCmd(cxt *command.Context) *cobra.Command {
 func (c *getCmd) run(args []string) error {
 	if len(args) == 0 {
 		return c.getAll()
-	} else {
-		key := args[0]
-		return c.get(key)
 	}
+
+	if c.lookupByUUID {
+		c.uuid = args[0]
+	} else {
+		c.name = args[0]
+	}
+
+	return c.get()
 }
 
 func (c *getCmd) getAll() error {
 	classes, err := client.RetrieveClasses(c.Client)
 	if err != nil {
-		return fmt.Errorf("unable to list classes (%s)", err)
+		return err
 	}
 
 	output.WriteClassList(c.Output, classes...)
 	return nil
 }
 
-func (c *getCmd) get(key string) error {
+func (c *getCmd) get() error {
 	var class *v1beta1.ClusterServiceClass
 	var err error
+
 	if c.lookupByUUID {
-		class, err = client.RetrieveClassByID(c.Client, key)
-	} else {
-		class, err = client.RetrieveClassByName(c.Client, key)
+		class, err = client.RetrieveClassByID(c.Client, c.uuid)
+	} else if c.name != "" {
+		class, err = client.RetrieveClassByName(c.Client, c.name)
 	}
 	if err != nil {
 		return err

@@ -14,6 +14,8 @@ type describeCmd struct {
 	*command.Context
 	traverse     bool
 	lookupByUUID bool
+	uuid         string
+	name         string
 }
 
 // NewDescribeCmd builds a "svcat describe class" command
@@ -53,17 +55,22 @@ func (c *describeCmd) run(args []string) error {
 		return fmt.Errorf("name or uuid is required")
 	}
 
-	key := args[0]
-	return c.describe(key)
+	if c.lookupByUUID {
+		c.uuid = args[0]
+	} else {
+		c.name = args[0]
+	}
+
+	return c.describe()
 }
 
-func (c *describeCmd) describe(key string) error {
+func (c *describeCmd) describe() error {
 	var class *v1beta1.ClusterServiceClass
 	var err error
 	if c.lookupByUUID {
-		class, err = client.RetrieveClassByID(c.Client, key)
+		class, err = client.RetrieveClassByID(c.Client, c.uuid)
 	} else {
-		class, err = client.RetrieveClassByName(c.Client, key)
+		class, err = client.RetrieveClassByName(c.Client, c.name)
 	}
 	if err != nil {
 		return err

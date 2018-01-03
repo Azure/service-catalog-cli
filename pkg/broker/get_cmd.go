@@ -9,6 +9,7 @@ import (
 
 type getCmd struct {
 	*command.Context
+	name string
 }
 
 // NewGetCmd builds a "svcat get brokers" command
@@ -34,8 +35,8 @@ func (c *getCmd) run(args []string) error {
 	if len(args) == 0 {
 		return c.getAll()
 	} else {
-		name := args[0]
-		return c.get(name)
+		c.name = args[0]
+		return c.get()
 	}
 }
 
@@ -49,8 +50,8 @@ func (c *getCmd) getAll() error {
 	return nil
 }
 
-func (c *getCmd) get(name string) error {
-	broker, err := client.RetrieveBroker(c.Client, name)
+func (c *getCmd) get() error {
+	broker, err := client.RetrieveBroker(c.Client, c.name)
 	if err != nil {
 		return err
 	}

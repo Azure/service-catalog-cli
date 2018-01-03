@@ -12,11 +12,14 @@ import (
 
 type provisonCmd struct {
 	*command.Context
-	ns        string
-	className string
-	planName  string
-	params    []string
-	secrets   []string
+	ns           string
+	instanceName string
+	className    string
+	planName     string
+	rawParams    []string
+	params       map[string]string
+	rawSecrets   []string
+	secrets      map[string]string
 }
 
 // NewProvisionCmd builds a "svcat provision" command
@@ -41,34 +44,36 @@ func NewProvisionCmd(cxt *command.Context) *cobra.Command {
 	cmd.Flags().StringVar(&provisionCmd.planName, "plan", "",
 		"The plan name (Required)")
 	cmd.MarkFlagRequired("plan")
-	cmd.Flags().StringArrayVarP(&provisionCmd.params, "param", "p", nil,
+	cmd.Flags().StringArrayVarP(&provisionCmd.rawParams, "param", "p", nil,
 		"Additional parameter to use when provisioning the service, format: NAME=VALUE")
-	cmd.Flags().StringArrayVarP(&provisionCmd.secrets, "secret", "s", nil,
+	cmd.Flags().StringArrayVarP(&provisionCmd.rawSecrets, "secret", "s", nil,
 		"Additional parameter, whose value is stored in a secret, to use when provisioning the service, format: SECRET[KEY]")
 	return cmd
 }
 
 func (c *provisonCmd) run(args []string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("name is required")
+		return fmt.Errorf("an instance name is required")
 	}
-	name := args[0]
+	c.instanceName = args[0]
 
-	params, err := parameters.ParseVariableAssignments(c.params)
+	var err error
+
+	c.params, err = parameters.ParseVariableAssignments(c.rawParams)
 	if err != nil {
 		return fmt.Errorf("invalid --param value (%s)", err)
 	}
 
-	secrets, err := parameters.ParseKeyMaps(c.secrets)
+	c.secrets, err = parameters.ParseKeyMaps(c.rawSecrets)
 	if err != nil {
 		return fmt.Errorf("invalid --secret value (%s)", err)
 	}
 
-	return c.provision(name, params, secrets)
+	return c.provision()
 }
 
-func (c *provisonCmd) provision(name string, params map[string]string, secrets map[string]string) error {
-	instance, err := client.Provision(c.Client, c.ns, name, c.className, c.planName, params, secrets)
+func (c *provisonCmd) provision() error {
+	instance, err := client.Provision(c.Client, c.ns, c.instanceName, c.className, c.planName, c.params, c.secrets)
 	if err != nil {
 		return err
 	}
