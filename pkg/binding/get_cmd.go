@@ -9,7 +9,8 @@ import (
 
 type getCmd struct {
 	*command.Context
-	ns string
+	ns   string
+	name string
 }
 
 // NewGetCmd builds a "svcat get bindings" command
@@ -43,8 +44,8 @@ func (c *getCmd) run(args []string) error {
 	if len(args) == 0 {
 		return c.getAll()
 	} else {
-		name := args[0]
-		return c.get(name)
+		c.name = args[0]
+		return c.get()
 	}
 }
 
@@ -58,8 +59,8 @@ func (c *getCmd) getAll() error {
 	return nil
 }
 
-func (c *getCmd) get(name string) error {
-	binding, err := client.RetrieveBinding(c.Client, c.ns, name)
+func (c *getCmd) get() error {
+	binding, err := client.RetrieveBinding(c.Client, c.ns, c.name)
 	if err != nil {
 		return err
 	}

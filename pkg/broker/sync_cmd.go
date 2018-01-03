@@ -10,6 +10,7 @@ import (
 
 type syncCmd struct {
 	*command.Context
+	name string
 }
 
 // NewSyncCmd builds a "svcat sync broker" command
@@ -29,17 +30,17 @@ func (c *syncCmd) run(args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("name is required")
 	}
-	name := args[0]
-	return c.sync(name)
+	c.name = args[0]
+	return c.sync()
 }
 
-func (c *syncCmd) sync(name string) error {
+func (c *syncCmd) sync() error {
 	const retries = 3
-	err := client.Sync(c.Client, name, retries)
+	err := client.Sync(c.Client, c.name, retries)
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprintf(c.Output, "Successfully fetched catalog entries from %s broker", name)
+	fmt.Fprintf(c.Output, "Successfully fetched catalog entries from %s broker", c.name)
 	return nil
 }

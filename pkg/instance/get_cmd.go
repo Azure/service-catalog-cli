@@ -9,7 +9,8 @@ import (
 
 type getCmd struct {
 	*command.Context
-	ns string
+	ns   string
+	name string
 }
 
 // NewGetCmd builds a "svcat get instances" command
@@ -42,8 +43,8 @@ func (c *getCmd) run(args []string) error {
 	if len(args) == 0 {
 		return c.getAll()
 	} else {
-		name := args[0]
-		return c.get(name)
+		c.name = args[0]
+		return c.get()
 	}
 }
 
@@ -57,8 +58,8 @@ func (c *getCmd) getAll() error {
 	return nil
 }
 
-func (c *getCmd) get(name string) error {
-	instance, err := client.RetrieveInstance(c.Client, c.ns, name)
+func (c *getCmd) get() error {
+	instance, err := client.RetrieveInstance(c.Client, c.ns, c.name)
 	if err != nil {
 		return err
 	}

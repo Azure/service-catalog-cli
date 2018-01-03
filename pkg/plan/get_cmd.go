@@ -13,6 +13,8 @@ import (
 type getCmd struct {
 	*command.Context
 	lookupByUUID bool
+	uuid         string
+	name         string
 }
 
 // NewGetCmd builds a "svcat get plans" command
@@ -44,10 +46,15 @@ func NewGetCmd(cxt *command.Context) *cobra.Command {
 func (c *getCmd) run(args []string) error {
 	if len(args) == 0 {
 		return c.getAll()
-	} else {
-		key := args[0]
-		return c.get(key)
 	}
+
+	if c.lookupByUUID {
+		c.uuid = args[0]
+	} else {
+		c.name = args[0]
+	}
+
+	return c.get()
 }
 
 func (c *getCmd) getAll() error {
@@ -66,13 +73,13 @@ func (c *getCmd) getAll() error {
 	return nil
 }
 
-func (c *getCmd) get(key string) error {
+func (c *getCmd) get() error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = client.RetrievePlanByID(c.Client, key)
+		plan, err = client.RetrievePlanByID(c.Client, c.uuid)
 	} else {
-		plan, err = client.RetrievePlanByName(c.Client, key)
+		plan, err = client.RetrievePlanByName(c.Client, c.name)
 	}
 
 	// Retrieve the class as well because plans don't have the external class name

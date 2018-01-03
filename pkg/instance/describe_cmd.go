@@ -12,6 +12,7 @@ import (
 type describeCmd struct {
 	*command.Context
 	ns       string
+	name     string
 	traverse bool
 }
 
@@ -50,13 +51,13 @@ func (c *describeCmd) run(args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("name is required")
 	}
+	c.name = args[0]
 
-	name := args[0]
-	return c.describe(name)
+	return c.describe()
 }
 
-func (c *describeCmd) describe(name string) error {
-	instance, err := client.RetrieveInstance(c.Client, c.ns, name)
+func (c *describeCmd) describe() error {
+	instance, err := client.RetrieveInstance(c.Client, c.ns, c.name)
 	if err != nil {
 		return err
 	}

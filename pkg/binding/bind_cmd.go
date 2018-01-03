@@ -16,8 +16,10 @@ type bindCmd struct {
 	instanceName string
 	bindingName  string
 	secretName   string
-	params       []string
-	secrets      []string
+	rawParams    []string
+	params       map[string]string
+	rawSecrets   []string
+	secrets      map[string]string
 }
 
 // NewBindCmd builds a "svcat bind" command
@@ -55,9 +57,9 @@ func NewBindCmd(cxt *command.Context) *cobra.Command {
 		"",
 		"The name of the secret. Defaults to the name of the instance.",
 	)
-	cmd.Flags().StringArrayVarP(&bindCmd.params, "param", "p", nil,
+	cmd.Flags().StringArrayVarP(&bindCmd.rawParams, "param", "p", nil,
 		"Additional parameter to use when binding the instance, format: NAME=VALUE")
-	cmd.Flags().StringArrayVarP(&bindCmd.secrets, "secret", "s", nil,
+	cmd.Flags().StringArrayVarP(&bindCmd.rawSecrets, "secret", "s", nil,
 		"Additional parameter, whose value is stored in a secret, to use when binding the instance, format: SECRET[KEY]")
 
 	return cmd
@@ -69,21 +71,22 @@ func (c *bindCmd) run(args []string) error {
 	}
 	c.instanceName = args[0]
 
-	params, err := parameters.ParseVariableAssignments(c.params)
+	var err error
+	c.params, err = parameters.ParseVariableAssignments(c.rawParams)
 	if err != nil {
 		return fmt.Errorf("invalid --param value (%s)", err)
 	}
 
-	secrets, err := parameters.ParseKeyMaps(c.secrets)
+	c.secrets, err = parameters.ParseKeyMaps(c.rawSecrets)
 	if err != nil {
 		return fmt.Errorf("invalid --secret value (%s)", err)
 	}
 
-	return c.bind(params, secrets)
+	return c.bind()
 }
 
-func (c *bindCmd) bind(params map[string]string, secrets map[string]string) error {
-	binding, err := client.Bind(c.Client, c.ns, c.bindingName, c.instanceName, c.secretName, params, secrets)
+func (c *bindCmd) bind() error {
+	binding, err := client.Bind(c.Client, c.ns, c.bindingName, c.instanceName, c.secretName, c.params, c.secrets)
 	if err != nil {
 		return err
 	}

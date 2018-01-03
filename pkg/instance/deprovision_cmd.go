@@ -10,7 +10,8 @@ import (
 
 type deprovisonCmd struct {
 	*command.Context
-	ns string
+	ns           string
+	instanceName string
 }
 
 // NewDeprovisionCmd builds a "svcat deprovision" command
@@ -35,11 +36,11 @@ func (c *deprovisonCmd) run(args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("name is required")
 	}
+	c.instanceName = args[0]
 
-	key := args[0]
-	return c.deprovision(key)
+	return c.deprovision()
 }
 
-func (c *deprovisonCmd) deprovision(instanceName string) error {
-	return client.Deprovision(c.Client, c.ns, instanceName)
+func (c *deprovisonCmd) deprovision() error {
+	return client.Deprovision(c.Client, c.ns, c.instanceName)
 }
