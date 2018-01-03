@@ -5,9 +5,9 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type getCmd struct {
@@ -51,18 +51,18 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	plans, err := c.Client.ServicecatalogV1beta1().ClusterServicePlans().List(v1.ListOptions{})
+	plans, err := client.RetrievePlans(c.Client)
 	if err != nil {
 		return fmt.Errorf("unable to list plans (%s)", err)
 	}
 
 	// Retrieve the classes as well because plans don't have the external class name
-	classes, err := c.Client.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
+	classes, err := client.RetrieveClasses(c.Client)
 	if err != nil {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
 
-	output.WritePlanList(c.Output, plans.Items, classes.Items)
+	output.WritePlanList(c.Output, plans, classes)
 	return nil
 }
 
@@ -70,15 +70,15 @@ func (c *getCmd) get(key string) error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = retrieveByUUID(c.Client, key)
+		plan, err = client.RetrievePlanByID(c.Client, key)
 	} else {
-		plan, err = RetrieveByName(c.Client, key)
+		plan, err = client.RetrievePlanByName(c.Client, key)
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := c.Client.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
+	class, err := client.RetrieveClassByName(c.Client, plan.Spec.ClusterServiceClassRef.Name)
 	if err != nil {
-		return fmt.Errorf("unable to get class '%s' (%s)", plan.Spec.ClusterServiceClassRef.Name, err)
+		return err
 	}
 
 	output.WritePlanList(c.Output, []v1beta1.ClusterServicePlan{*plan}, []v1beta1.ClusterServiceClass{*class})
