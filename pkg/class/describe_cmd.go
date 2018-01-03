@@ -5,7 +5,7 @@ import (
 
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
-	"github.com/Azure/service-catalog-cli/pkg/traverse"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
 )
@@ -61,9 +61,9 @@ func (c *describeCmd) describe(key string) error {
 	var class *v1beta1.ClusterServiceClass
 	var err error
 	if c.lookupByUUID {
-		class, err = retrieveByUUID(c.Client, key)
+		class, err = client.RetrieveClassByID(c.Client, key)
 	} else {
-		class, err = RetrieveByName(c.Client, key)
+		class, err = client.RetrieveClassByName(c.Client, key)
 	}
 	if err != nil {
 		return err
@@ -71,14 +71,14 @@ func (c *describeCmd) describe(key string) error {
 
 	output.WriteClassDetails(c.Output, class)
 
-	plans, err := traverse.ClassToPlans(c.Client, class)
+	plans, err := client.RetrievePlansByClass(c.Client, class)
 	if err != nil {
 		return err
 	}
 	output.WriteAssociatedPlans(c.Output, plans)
 
 	if c.traverse {
-		broker, err := traverse.ClassToBroker(c.Client, class)
+		broker, err := client.RetrieveBrokerByClass(c.Client, class)
 		if err != nil {
 			return err
 		}
