@@ -1,10 +1,10 @@
-package instance
+package binding
 
 import (
 	"fmt"
 
-	"github.com/Azure/service-catalog-cli/pkg/command"
-	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
+	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
 	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
@@ -16,15 +16,15 @@ type describeCmd struct {
 	traverse bool
 }
 
-// NewDescribeCmd builds a "svcat describe instance" command
+// NewDescribeCmd builds a "svcat describe binding" command
 func NewDescribeCmd(cxt *command.Context) *cobra.Command {
 	describeCmd := &describeCmd{Context: cxt}
 	cmd := &cobra.Command{
-		Use:     "instance NAME",
-		Aliases: []string{"instances", "inst"},
-		Short:   "Show details of a specific instance",
+		Use:     "binding NAME",
+		Aliases: []string{"bindings", "bnd"},
+		Short:   "Show details of a specific binding",
 		Example: `
-  svcat describe instance wordpress-mysql-instance
+  svcat describe binding wordpress-mysql-binding
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return describeCmd.run(args)
@@ -35,7 +35,7 @@ func NewDescribeCmd(cxt *command.Context) *cobra.Command {
 		"namespace",
 		"n",
 		"default",
-		"The namespace in which to get the instance",
+		"The namespace in which to get the binding",
 	)
 	cmd.Flags().BoolVarP(
 		&describeCmd.traverse,
@@ -57,24 +57,19 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe() error {
-	instance, err := client.RetrieveInstance(c.Client, c.ns, c.name)
+	binding, err := client.RetrieveBinding(c.Client, c.ns, c.name)
 	if err != nil {
 		return err
 	}
 
-	output.WriteInstanceDetails(c.Output, instance)
-
-	bindings, err := client.RetrieveBindingsByInstance(c.Client, instance)
-	if err != nil {
-		return err
-	}
-	output.WriteAssociatedBindings(c.Output, bindings)
+	output.WriteBindingDetails(c.Output, binding)
 
 	if c.traverse {
-		class, plan, broker, err := client.InstanceParentHierarchy(c.Client, instance)
+		instance, class, plan, broker, err := client.BindingParentHierarchy(c.Client, binding)
 		if err != nil {
-			return fmt.Errorf("unable to traverse up the instance hierarchy (%s)", err)
+			return fmt.Errorf("unable to traverse up the binding hierarchy (%s)", err)
 		}
+		output.WriteParentInstance(c.Output, instance)
 		output.WriteParentClass(c.Output, class)
 		output.WriteParentPlan(c.Output, plan)
 		output.WriteParentBroker(c.Output, broker)

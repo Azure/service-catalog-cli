@@ -1,8 +1,8 @@
 package class
 
 import (
-	"github.com/Azure/service-catalog-cli/pkg/command"
-	"github.com/Azure/service-catalog-cli/pkg/output"
+	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
+	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
 	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
