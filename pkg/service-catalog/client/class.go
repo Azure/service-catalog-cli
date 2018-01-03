@@ -46,3 +46,14 @@ func RetrieveClassByID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterSe
 	}
 	return class, nil
 }
+
+func RetrieveClassByPlan(cl *clientset.Clientset, plan *v1beta1.ClusterServicePlan,
+) (*v1beta1.ClusterServiceClass, error) {
+	// Retrieve the class as well because plans don't have the external class name
+	class, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to get class (%s)", err)
+	}
+
+	return class, nil
+}

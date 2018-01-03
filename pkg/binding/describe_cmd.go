@@ -6,7 +6,6 @@ import (
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
-	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/spf13/cobra"
 )
 
@@ -65,7 +64,7 @@ func (c *describeCmd) describe(name string) error {
 	output.WriteBindingDetails(c.Output, binding)
 
 	if c.traverse {
-		instance, class, plan, broker, err := traverse.BindingParentHierarchy(c.Client, binding)
+		instance, class, plan, broker, err := client.BindingParentHierarchy(c.Client, binding)
 		if err != nil {
 			return fmt.Errorf("unable to traverse up the binding hierarchy (%s)", err)
 		}

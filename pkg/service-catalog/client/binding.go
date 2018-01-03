@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/hashicorp/go-multierror"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
@@ -27,6 +26,25 @@ func RetrieveBinding(cl *clientset.Clientset, ns, name string) (*v1beta1.Service
 		return nil, fmt.Errorf("unable to get binding '%s.%s' (%+v)", ns, name, err)
 	}
 	return binding, nil
+}
+
+// RetrieveBindingsByInstance retrieves all child bindings for an instance.
+func RetrieveBindingsByInstance(cl *clientset.Clientset, instance *v1beta1.ServiceInstance,
+) ([]v1beta1.ServiceBinding, error) {
+	// Not using a filtered list operation because it's not supported yet.
+	results, err := cl.ServicecatalogV1beta1().ServiceBindings(instance.Namespace).List(v1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to search bindings (%s)", err)
+	}
+
+	var bindings []v1beta1.ServiceBinding
+	for _, binding := range results.Items {
+		if binding.Spec.ServiceInstanceRef.Name == instance.Name {
+			bindings = append(bindings, binding)
+		}
+	}
+
+	return bindings, nil
 }
 
 func Bind(cl *clientset.Clientset, namespace, bindingName, instanceName, secretName string,
@@ -68,7 +86,7 @@ func Unbind(cl *clientset.Clientset, ns, instanceName string) error {
 			Name:      instanceName,
 		},
 	}
-	bindings, err := traverse.InstanceToBindings(cl, instance)
+	bindings, err := RetrieveBindingsByInstance(cl, instance)
 	if err != nil {
 		return err
 	}
@@ -119,4 +137,25 @@ func joinErrors(groupMsg string, errors []error, sep string, a ...interface{}) s
 	}
 
 	return strings.Join(msgs, sep)
+}
+
+// BindingParentHierarchy retrieves all ancestor resources of a binding.
+func BindingParentHierarchy(cl *clientset.Clientset, binding *v1beta1.ServiceBinding,
+) (*v1beta1.ServiceInstance, *v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
+	instance, err := RetrieveInstanceByBinding(cl, binding)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	class, plan, err := InstanceToServiceClassAndPlan(cl, instance)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	broker, err := RetrieveBrokerByClass(cl, class)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	return instance, class, plan, broker, nil
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/Azure/service-catalog-cli/pkg/command"
 	"github.com/Azure/service-catalog-cli/pkg/output"
 	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
-	"github.com/Azure/service-catalog-cli/pkg/traverse"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
 )
@@ -71,21 +70,21 @@ func (c *describeCmd) describe(key string) error {
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := traverse.PlanToClass(c.Client, plan)
+	class, err := client.RetrieveClassByPlan(c.Client, plan)
 	if err != nil {
 		return err
 	}
 
 	output.WritePlanDetails(c.Output, plan, class)
 
-	instances, err := traverse.PlanToInstances(c.Client, plan)
+	instances, err := client.RetrieveInstancesByPlan(c.Client, plan)
 	if err != nil {
 		return err
 	}
 	output.WriteAssociatedInstances(c.Output, instances)
 
 	if c.traverse {
-		broker, err := traverse.ClassToBroker(c.Client, class)
+		broker, err := client.RetrieveBrokerByClass(c.Client, class)
 		if err != nil {
 			return err
 		}

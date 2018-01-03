@@ -11,6 +11,7 @@ import (
 
 const (
 	FieldExternalPlanName = "spec.externalName"
+	FieldServiceClassRef  = "spec.clusterServiceClassRef.name"
 )
 
 func RetrievePlans(cl *clientset.Clientset) ([]v1beta1.ClusterServicePlan, error) {
@@ -45,4 +46,18 @@ func RetrievePlanByID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterSer
 		return nil, fmt.Errorf("unable to get plan by uuid '%s' (%s)", uuid, err)
 	}
 	return plan, nil
+}
+
+// RetrievePlansByClass retrieves all plans for a class.
+func RetrievePlansByClass(cl *clientset.Clientset, class *v1beta1.ClusterServiceClass,
+) ([]v1beta1.ClusterServicePlan, error) {
+	planOpts := v1.ListOptions{
+		FieldSelector: fields.OneTermEqualSelector(FieldServiceClassRef, class.Name).String(),
+	}
+	plans, err := cl.ServicecatalogV1beta1().ClusterServicePlans().List(planOpts)
+	if err != nil {
+		return nil, fmt.Errorf("unable to list plans (%s)", err)
+	}
+
+	return plans.Items, nil
 }

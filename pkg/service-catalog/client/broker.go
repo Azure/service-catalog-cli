@@ -16,3 +16,16 @@ func RetrieveBroker(cl *clientset.Clientset, name string) (*v1beta1.ClusterServi
 
 	return broker, nil
 }
+
+// RetrieveBrokerByClass retrieves the parent broker of a class.
+func RetrieveBrokerByClass(
+	cl *clientset.Clientset,
+	class *v1beta1.ClusterServiceClass,
+) (*v1beta1.ClusterServiceBroker, error) {
+	brokerName := class.Spec.ClusterServiceBrokerName
+	broker, err := cl.ServicecatalogV1beta1().ClusterServiceBrokers().Get(brokerName, v1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return broker, nil
+}
