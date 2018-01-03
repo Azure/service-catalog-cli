@@ -134,6 +134,9 @@ Plans:
 $ svcat provision quickstart-wordpress-mysql-instance \
     --class azure-mysqldb --plan standard800 \
     -p location=eastus -p resourceGroup=default
+    -p sslEnforcement=disabled \
+    -p firewallStartIPAddress=0.0.0.0 \
+    -p firewallEndIPAddress=255.255.255.255
 ```
 
 ## View all instances of a service plan on the cluster
@@ -162,6 +165,20 @@ $ svcat get bindings --namespace cms
 +----------------------------------+-----------+-----------------------------------+--------+
   deepthoughts-ghost-mysql-binding   cms         deepthoughts-ghost-mysql-instance   Ready
   ponycms-wordpress-mysql-binding    cms         ponycms-wordpress-mysql-instance    Ready
+```
+
+## Bind an instance
+
+```console
+$ svcat bind quickstart-wordpress-mysql-instance
+    --name quickstart-wordpress-mysql-binding \
+    --secret-name quickstart-wordpress-secret
+```
+
+When omitted, the names of the binding and secret are defaulted to the name of the instance.
+
+```console
+$ svcat bind wordpress-mysql
 ```
 
 ## View the details of a service instance
