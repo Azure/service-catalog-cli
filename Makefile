@@ -53,15 +53,15 @@ verify-vendor: check-dep
 
 # Run unit tests
 test:
-	go test -v -short ./... --update=$(UPDATE_GOLDEN)
+	go test -short ./... --update=$(UPDATE_GOLDEN)
 
 # Run integration tests
 test-int:
-	go test -v -run Integration ./...
+	go test -run Integration ./pkg/svcat
 
 # Run all tests
 test-all:
-	go test -v ./... --update=$(UPDATE_GOLDEN)
+	go test ./... --update=$(UPDATE_GOLDEN)
 
 install: build
 	cp ./bin/svcat $(GOPATH)/bin/
