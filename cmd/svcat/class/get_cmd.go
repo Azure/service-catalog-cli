@@ -3,7 +3,6 @@ package class
 import (
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
 )
@@ -56,7 +55,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	classes, err := client.RetrieveClasses(c.Client)
+	classes, err := c.Client.RetrieveClasses()
 	if err != nil {
 		return err
 	}
@@ -70,9 +69,9 @@ func (c *getCmd) get() error {
 	var err error
 
 	if c.lookupByUUID {
-		class, err = client.RetrieveClassByID(c.Client, c.uuid)
+		class, err = c.Client.RetrieveClassByID(c.uuid)
 	} else if c.name != "" {
-		class, err = client.RetrieveClassByName(c.Client, c.name)
+		class, err = c.Client.RetrieveClassByName(c.name)
 	}
 	if err != nil {
 		return err

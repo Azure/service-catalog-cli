@@ -6,7 +6,6 @@ import (
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/parameters"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -73,7 +72,7 @@ func (c *provisonCmd) run(args []string) error {
 }
 
 func (c *provisonCmd) provision() error {
-	instance, err := client.Provision(c.Client, c.ns, c.instanceName, c.className, c.planName, c.params, c.secrets)
+	instance, err := c.Client.Provision(c.ns, c.instanceName, c.className, c.planName, c.params, c.secrets)
 	if err != nil {
 		return err
 	}

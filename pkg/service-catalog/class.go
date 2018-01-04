@@ -1,10 +1,9 @@
-package client
+package servicecatalog
 
 import (
 	"fmt"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 )
@@ -13,8 +12,8 @@ const (
 	FieldExternalClassName = "spec.externalName"
 )
 
-func RetrieveClasses(cl *clientset.Clientset) ([]v1beta1.ClusterServiceClass, error) {
-	classes, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
+func (sdk *SDK) RetrieveClasses() ([]v1beta1.ClusterServiceClass, error) {
+	classes, err := sdk.ServiceCatalog().ClusterServiceClasses().List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list classes (%s)", err)
 	}
@@ -22,11 +21,11 @@ func RetrieveClasses(cl *clientset.Clientset) ([]v1beta1.ClusterServiceClass, er
 	return classes.Items, nil
 }
 
-func RetrieveClassByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServiceClass, error) {
+func (sdk *SDK) RetrieveClassByName(name string) (*v1beta1.ClusterServiceClass, error) {
 	opts := v1.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(FieldExternalClassName, name).String(),
 	}
-	searchResults, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().List(opts)
+	searchResults, err := sdk.ServiceCatalog().ClusterServiceClasses().List(opts)
 	if err != nil {
 		return nil, fmt.Errorf("unable to search classes by name (%s)", err)
 	}
@@ -39,18 +38,18 @@ func RetrieveClassByName(cl *clientset.Clientset, name string) (*v1beta1.Cluster
 	return &searchResults.Items[0], nil
 }
 
-func RetrieveClassByID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterServiceClass, error) {
-	class, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(uuid, v1.GetOptions{})
+func (sdk *SDK) RetrieveClassByID(uuid string) (*v1beta1.ClusterServiceClass, error) {
+	class, err := sdk.ServiceCatalog().ClusterServiceClasses().Get(uuid, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get class (%s)", err)
 	}
 	return class, nil
 }
 
-func RetrieveClassByPlan(cl *clientset.Clientset, plan *v1beta1.ClusterServicePlan,
+func (sdk *SDK) RetrieveClassByPlan(plan *v1beta1.ClusterServicePlan,
 ) (*v1beta1.ClusterServiceClass, error) {
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
+	class, err := sdk.ServiceCatalog().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get class (%s)", err)
 	}

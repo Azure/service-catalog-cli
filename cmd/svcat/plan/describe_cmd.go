@@ -5,7 +5,6 @@ import (
 
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
 )
@@ -68,30 +67,30 @@ func (c *describeCmd) describe() error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = client.RetrievePlanByID(c.Client, c.uuid)
+		plan, err = c.Client.RetrievePlanByID(c.uuid)
 	} else {
-		plan, err = client.RetrievePlanByName(c.Client, c.name)
+		plan, err = c.Client.RetrievePlanByName(c.name)
 	}
 	if err != nil {
 		return err
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := client.RetrieveClassByPlan(c.Client, plan)
+	class, err := c.Client.RetrieveClassByPlan(plan)
 	if err != nil {
 		return err
 	}
 
 	output.WritePlanDetails(c.Output, plan, class)
 
-	instances, err := client.RetrieveInstancesByPlan(c.Client, plan)
+	instances, err := c.Client.RetrieveInstancesByPlan(plan)
 	if err != nil {
 		return err
 	}
 	output.WriteAssociatedInstances(c.Output, instances)
 
 	if c.traverse {
-		broker, err := client.RetrieveBrokerByClass(c.Client, class)
+		broker, err := c.Client.RetrieveBrokerByClass(class)
 		if err != nil {
 			return err
 		}

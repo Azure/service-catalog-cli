@@ -3,7 +3,7 @@ package command
 import (
 	"io"
 
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog"
 )
 
 // Context is ambient data necessary to run any svcat command.
@@ -12,5 +12,5 @@ type Context struct {
 	Output io.Writer
 
 	// Client for the service catalog API.
-	Client *clientset.Clientset
+	Client *servicecatalog.SDK
 }

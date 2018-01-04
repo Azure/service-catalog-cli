@@ -3,7 +3,6 @@ package broker
 import (
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +40,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	brokers, err := client.RetrieveBrokers(c.Client)
+	brokers, err := c.Client.RetrieveBrokers()
 	if err != nil {
 		return err
 	}
@@ -51,7 +50,7 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get() error {
-	broker, err := client.RetrieveBroker(c.Client, c.name)
+	broker, err := c.Client.RetrieveBroker(c.name)
 	if err != nil {
 		return err
 	}

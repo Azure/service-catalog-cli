@@ -3,7 +3,6 @@ package binding
 import (
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -50,7 +49,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	bindings, err := client.RetrieveBindings(c.Client, c.ns)
+	bindings, err := c.Client.RetrieveBindings(c.ns)
 	if err != nil {
 		return err
 	}
@@ -60,7 +59,7 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get() error {
-	binding, err := client.RetrieveBinding(c.Client, c.ns, c.name)
+	binding, err := c.Client.RetrieveBinding(c.ns, c.name)
 	if err != nil {
 		return err
 	}

@@ -6,7 +6,6 @@ import (
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/parameters"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -86,7 +85,7 @@ func (c *bindCmd) run(args []string) error {
 }
 
 func (c *bindCmd) bind() error {
-	binding, err := client.Bind(c.Client, c.ns, c.bindingName, c.instanceName, c.secretName, c.params, c.secrets)
+	binding, err := c.Client.Bind(c.ns, c.bindingName, c.instanceName, c.secretName, c.params, c.secrets)
 	if err != nil {
 		return err
 	}
