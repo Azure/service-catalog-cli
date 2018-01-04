@@ -7,11 +7,10 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func RetrieveBindings(cl *clientset.Clientset, ns string) (*v1beta1.ServiceBindingList, error) {
+func (cl *Client) RetrieveBindings(ns string) (*v1beta1.ServiceBindingList, error) {
 	bindings, err := cl.ServicecatalogV1beta1().ServiceBindings(ns).List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list bindings in %s (%s)", ns, err)
@@ -20,7 +19,7 @@ func RetrieveBindings(cl *clientset.Clientset, ns string) (*v1beta1.ServiceBindi
 	return bindings, nil
 }
 
-func RetrieveBinding(cl *clientset.Clientset, ns, name string) (*v1beta1.ServiceBinding, error) {
+func (cl *Client) RetrieveBinding(ns, name string) (*v1beta1.ServiceBinding, error) {
 	binding, err := cl.ServicecatalogV1beta1().ServiceBindings(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get binding '%s.%s' (%+v)", ns, name, err)
@@ -29,7 +28,7 @@ func RetrieveBinding(cl *clientset.Clientset, ns, name string) (*v1beta1.Service
 }
 
 // RetrieveBindingsByInstance retrieves all child bindings for an instance.
-func RetrieveBindingsByInstance(cl *clientset.Clientset, instance *v1beta1.ServiceInstance,
+func (cl *Client) RetrieveBindingsByInstance(instance *v1beta1.ServiceInstance,
 ) ([]v1beta1.ServiceBinding, error) {
 	// Not using a filtered list operation because it's not supported yet.
 	results, err := cl.ServicecatalogV1beta1().ServiceBindings(instance.Namespace).List(v1.ListOptions{})
@@ -47,7 +46,7 @@ func RetrieveBindingsByInstance(cl *clientset.Clientset, instance *v1beta1.Servi
 	return bindings, nil
 }
 
-func Bind(cl *clientset.Clientset, namespace, bindingName, instanceName, secretName string,
+func (cl *Client) Bind(namespace, bindingName, instanceName, secretName string,
 	params map[string]string, secrets map[string]string) (*v1beta1.ServiceBinding, error) {
 
 	// Manually defaulting the name of the binding
@@ -79,14 +78,14 @@ func Bind(cl *clientset.Clientset, namespace, bindingName, instanceName, secretN
 	return result, nil
 }
 
-func Unbind(cl *clientset.Clientset, ns, instanceName string) error {
+func (cl *Client) Unbind(ns, instanceName string) error {
 	instance := &v1beta1.ServiceInstance{
 		ObjectMeta: v1.ObjectMeta{
 			Namespace: ns,
 			Name:      instanceName,
 		},
 	}
-	bindings, err := RetrieveBindingsByInstance(cl, instance)
+	bindings, err := cl.RetrieveBindingsByInstance(instance)
 	if err != nil {
 		return err
 	}
@@ -97,7 +96,7 @@ func Unbind(cl *clientset.Clientset, ns, instanceName string) error {
 		g.Add(1)
 		go func(binding v1beta1.ServiceBinding) {
 			defer g.Done()
-			errs <- DeleteBinding(cl, binding.Namespace, binding.Name)
+			errs <- cl.DeleteBinding(binding.Namespace, binding.Name)
 		}(binding)
 	}
 
@@ -117,7 +116,7 @@ func Unbind(cl *clientset.Clientset, ns, instanceName string) error {
 	return bindErr.ErrorOrNil()
 }
 
-func DeleteBinding(cl *clientset.Clientset, ns, bindingName string) error {
+func (cl *Client) DeleteBinding(ns, bindingName string) error {
 	err := cl.ServicecatalogV1beta1().ServiceBindings(ns).Delete(bindingName, &v1.DeleteOptions{})
 	if err != nil {
 		return fmt.Errorf("remove binding %s/%s failed (%s)", ns, bindingName, err)
@@ -140,19 +139,19 @@ func joinErrors(groupMsg string, errors []error, sep string, a ...interface{}) s
 }
 
 // BindingParentHierarchy retrieves all ancestor resources of a binding.
-func BindingParentHierarchy(cl *clientset.Clientset, binding *v1beta1.ServiceBinding,
+func (cl *Client) BindingParentHierarchy(binding *v1beta1.ServiceBinding,
 ) (*v1beta1.ServiceInstance, *v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
-	instance, err := RetrieveInstanceByBinding(cl, binding)
+	instance, err := cl.RetrieveInstanceByBinding(binding)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	class, plan, err := InstanceToServiceClassAndPlan(cl, instance)
+	class, plan, err := cl.InstanceToServiceClassAndPlan(instance)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	broker, err := RetrieveBrokerByClass(cl, class)
+	broker, err := cl.RetrieveBrokerByClass(class)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 )
@@ -13,7 +12,7 @@ const (
 	FieldServicePlanRef = "spec.clusterServicePlanRef.name"
 )
 
-func RetrieveInstances(cl *clientset.Clientset, ns string) (*v1beta1.ServiceInstanceList, error) {
+func (cl *Client) RetrieveInstances(ns string) (*v1beta1.ServiceInstanceList, error) {
 	instances, err := cl.ServicecatalogV1beta1().ServiceInstances(ns).List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list instances in %s (%s)", ns, err)
@@ -22,7 +21,7 @@ func RetrieveInstances(cl *clientset.Clientset, ns string) (*v1beta1.ServiceInst
 	return instances, nil
 }
 
-func RetrieveInstance(cl *clientset.Clientset, ns, name string) (*v1beta1.ServiceInstance, error) {
+func (cl *Client) RetrieveInstance(ns, name string) (*v1beta1.ServiceInstance, error) {
 	instance, err := cl.ServicecatalogV1beta1().ServiceInstances(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get instance '%s.%s' (%s)", ns, name, err)
@@ -31,9 +30,7 @@ func RetrieveInstance(cl *clientset.Clientset, ns, name string) (*v1beta1.Servic
 }
 
 // RetrieveInstanceByBinding retrieves the parent instance for a binding.
-func RetrieveInstanceByBinding(
-	cl *clientset.Clientset,
-	b *v1beta1.ServiceBinding,
+func (cl *Client) RetrieveInstanceByBinding(b *v1beta1.ServiceBinding,
 ) (*v1beta1.ServiceInstance, error) {
 	ns := b.Namespace
 	instName := b.Spec.ServiceInstanceRef.Name
@@ -45,7 +42,7 @@ func RetrieveInstanceByBinding(
 }
 
 // RetrieveInstancesByPlan retrieves all instances of a plan.
-func RetrieveInstancesByPlan(cl *clientset.Clientset, plan *v1beta1.ClusterServicePlan,
+func (cl *Client) RetrieveInstancesByPlan(plan *v1beta1.ClusterServicePlan,
 ) ([]v1beta1.ServiceInstance, error) {
 	planOpts := v1.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(FieldServicePlanRef, plan.Name).String(),
@@ -59,14 +56,14 @@ func RetrieveInstancesByPlan(cl *clientset.Clientset, plan *v1beta1.ClusterServi
 }
 
 // InstanceParentHierarchy retrieves all ancestor resources of an instance.
-func InstanceParentHierarchy(cl *clientset.Clientset, instance *v1beta1.ServiceInstance,
+func (cl *Client) InstanceParentHierarchy(instance *v1beta1.ServiceInstance,
 ) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
-	class, plan, err := InstanceToServiceClassAndPlan(cl, instance)
+	class, plan, err := cl.InstanceToServiceClassAndPlan(instance)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	broker, err := RetrieveBrokerByClass(cl, class)
+	broker, err := cl.RetrieveBrokerByClass(class)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -75,9 +72,7 @@ func InstanceParentHierarchy(cl *clientset.Clientset, instance *v1beta1.ServiceI
 }
 
 // InstanceToServiceClassAndPlan retrieves the parent class and plan for an instance.
-func InstanceToServiceClassAndPlan(
-	cl *clientset.Clientset,
-	instance *v1beta1.ServiceInstance,
+func (cl *Client) InstanceToServiceClassAndPlan(instance *v1beta1.ServiceInstance,
 ) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, error) {
 	classID := instance.Spec.ClusterServiceClassRef.Name
 	classCh := make(chan *v1beta1.ClusterServiceClass)
@@ -126,7 +121,7 @@ func InstanceToServiceClassAndPlan(
 	}
 }
 
-func Provision(cl *clientset.Clientset, namespace, instanceName, className, planName string,
+func (cl *Client) Provision(namespace, instanceName, className, planName string,
 	params map[string]string, secrets map[string]string) (*v1beta1.ServiceInstance, error) {
 
 	request := &v1beta1.ServiceInstance{
@@ -151,7 +146,7 @@ func Provision(cl *clientset.Clientset, namespace, instanceName, className, plan
 	return result, nil
 }
 
-func Deprovision(cl *clientset.Clientset, namespace, instanceName string) error {
+func (cl *Client) Deprovision(namespace, instanceName string) error {
 	err := cl.ServicecatalogV1beta1().ServiceInstances(namespace).Delete(instanceName, &v1.DeleteOptions{})
 	if err != nil {
 		return fmt.Errorf("deprovision request failed (%s)", err)

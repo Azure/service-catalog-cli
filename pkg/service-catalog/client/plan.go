@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 )
@@ -14,7 +13,7 @@ const (
 	FieldServiceClassRef  = "spec.clusterServiceClassRef.name"
 )
 
-func RetrievePlans(cl *clientset.Clientset) ([]v1beta1.ClusterServicePlan, error) {
+func (cl *Client) RetrievePlans() ([]v1beta1.ClusterServicePlan, error) {
 	plans, err := cl.ServicecatalogV1beta1().ClusterServicePlans().List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list plans (%s)", err)
@@ -23,7 +22,7 @@ func RetrievePlans(cl *clientset.Clientset) ([]v1beta1.ClusterServicePlan, error
 	return plans.Items, nil
 }
 
-func RetrievePlanByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterServicePlan, error) {
+func (cl *Client) RetrievePlanByName(name string) (*v1beta1.ClusterServicePlan, error) {
 	opts := v1.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(FieldExternalPlanName, name).String(),
 	}
@@ -40,7 +39,7 @@ func RetrievePlanByName(cl *clientset.Clientset, name string) (*v1beta1.ClusterS
 	return &searchResults.Items[0], nil
 }
 
-func RetrievePlanByID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterServicePlan, error) {
+func (cl *Client) RetrievePlanByID(uuid string) (*v1beta1.ClusterServicePlan, error) {
 	plan, err := cl.ServicecatalogV1beta1().ClusterServicePlans().Get(uuid, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get plan by uuid '%s' (%s)", uuid, err)
@@ -49,7 +48,7 @@ func RetrievePlanByID(cl *clientset.Clientset, uuid string) (*v1beta1.ClusterSer
 }
 
 // RetrievePlansByClass retrieves all plans for a class.
-func RetrievePlansByClass(cl *clientset.Clientset, class *v1beta1.ClusterServiceClass,
+func (cl *Client) RetrievePlansByClass(class *v1beta1.ClusterServiceClass,
 ) ([]v1beta1.ClusterServicePlan, error) {
 	planOpts := v1.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(FieldServiceClassRef, class.Name).String(),
