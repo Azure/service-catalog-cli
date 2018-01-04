@@ -3,16 +3,22 @@ package svcat
 import (
 	"testing"
 
-	"github.com/Azure/service-catalog-cli/internal/test"
+	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 )
 
-func TestIntegrationBrokerGetAll(t *testing.T) {
-	test.FilterTestSuite(t)
+func GetTestApp(t *testing.T) *App {
+	t.Helper()
 
 	svcat, err := NewApp("", "")
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
+
+	return svcat
+}
+
+func GetTestBroker(t *testing.T, svcat *App) *v1beta1.ClusterServiceBroker {
+	t.Helper()
 
 	brokers, err := svcat.RetrieveBrokers()
 	if err != nil {
@@ -20,6 +26,8 @@ func TestIntegrationBrokerGetAll(t *testing.T) {
 	}
 
 	if len(brokers) == 0 {
-		t.Fatalf("expected at least one broker")
+		t.Fatalf("no test broker found")
 	}
+
+	return &brokers[0]
 }
