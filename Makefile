@@ -51,8 +51,17 @@ verify-vendor: check-dep
 		exit 2; \
 	fi
 
+# Run unit tests
 test:
-	go test ./... --update=$(UPDATE_GOLDEN)
+	go test -v -short ./... --update=$(UPDATE_GOLDEN)
+
+# Run integration tests
+test-int:
+	go test -v -run Integration ./...
+
+# Run all tests
+test-all:
+	go test -v ./... --update=$(UPDATE_GOLDEN)
 
 install: build
 	cp ./bin/svcat $(GOPATH)/bin/

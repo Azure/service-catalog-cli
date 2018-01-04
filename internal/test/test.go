@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -59,5 +60,14 @@ func AssertEqualsGoldenFile(t *testing.T, goldenFile string, got string) {
 		} else {
 			t.Fatalf("does not match golden file %s\n\nWANT:\n%q\n\nGOT:\n%q\n", path, want, gotB)
 		}
+	}
+}
+
+// FilterTestSuite flags a test as an integration test and skips it if we are only running an abbreviated test suite.
+func FilterTestSuite(t *testing.T) {
+	isIntegration := strings.HasPrefix(t.Name(), "TestIntegration")
+
+	if isIntegration && testing.Short() {
+		t.SkipNow()
 	}
 }
