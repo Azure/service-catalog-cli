@@ -8,7 +8,7 @@ import (
 
 // EnvSettings describes all of the environment settings.
 type EnvSettings struct {
-	// KubeContext is the name of the kube context.
+	// KubeContext is the name of the kubecontext.
 	KubeContext string
 	// KubeConfig is the name of the kubeconfig file.
 	KubeConfig string
@@ -16,7 +16,7 @@ type EnvSettings struct {
 
 // AddFlags binds flags to the given flagset.
 func (s *EnvSettings) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&s.KubeContext, "kube-context", "", "name of the kube context to use")
+	fs.StringVar(&s.KubeContext, "kube-context", "", "name of the kube context to use. Overrides $KUBECONTEXT")
 	fs.StringVar(&s.KubeConfig, "kubeconfig", "", "path to kubeconfig file. Overrides $KUBECONFIG")
 }
 
@@ -25,6 +25,11 @@ func (s *EnvSettings) Init() {
 	if s.KubeConfig == "" {
 		if kubeconfig, ok := os.LookupEnv("KUBECONFIG"); ok {
 			s.KubeConfig = kubeconfig
+		}
+	}
+	if s.KubeContext == "" {
+		if kubecontext, ok := os.LookupEnv("KUBECONTEXT"); ok {
+			s.KubeContext = kubecontext
 		}
 	}
 }

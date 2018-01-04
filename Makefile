@@ -51,7 +51,16 @@ verify-vendor: check-dep
 		exit 2; \
 	fi
 
+# Run unit tests
 test:
+	go test -short ./... --update=$(UPDATE_GOLDEN)
+
+# Run integration tests
+test-int:
+	go test -run Integration ./pkg/svcat
+
+# Run all tests
+test-all:
 	go test ./... --update=$(UPDATE_GOLDEN)
 
 install: build
