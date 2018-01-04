@@ -1,4 +1,4 @@
-package client
+package servicecatalog
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (cl *Client) RetrieveBindings(ns string) (*v1beta1.ServiceBindingList, error) {
+func (cl *SDK) RetrieveBindings(ns string) (*v1beta1.ServiceBindingList, error) {
 	bindings, err := cl.ServicecatalogV1beta1().ServiceBindings(ns).List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list bindings in %s (%s)", ns, err)
@@ -19,7 +19,7 @@ func (cl *Client) RetrieveBindings(ns string) (*v1beta1.ServiceBindingList, erro
 	return bindings, nil
 }
 
-func (cl *Client) RetrieveBinding(ns, name string) (*v1beta1.ServiceBinding, error) {
+func (cl *SDK) RetrieveBinding(ns, name string) (*v1beta1.ServiceBinding, error) {
 	binding, err := cl.ServicecatalogV1beta1().ServiceBindings(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get binding '%s.%s' (%+v)", ns, name, err)
@@ -28,7 +28,7 @@ func (cl *Client) RetrieveBinding(ns, name string) (*v1beta1.ServiceBinding, err
 }
 
 // RetrieveBindingsByInstance retrieves all child bindings for an instance.
-func (cl *Client) RetrieveBindingsByInstance(instance *v1beta1.ServiceInstance,
+func (cl *SDK) RetrieveBindingsByInstance(instance *v1beta1.ServiceInstance,
 ) ([]v1beta1.ServiceBinding, error) {
 	// Not using a filtered list operation because it's not supported yet.
 	results, err := cl.ServicecatalogV1beta1().ServiceBindings(instance.Namespace).List(v1.ListOptions{})
@@ -46,7 +46,7 @@ func (cl *Client) RetrieveBindingsByInstance(instance *v1beta1.ServiceInstance,
 	return bindings, nil
 }
 
-func (cl *Client) Bind(namespace, bindingName, instanceName, secretName string,
+func (cl *SDK) Bind(namespace, bindingName, instanceName, secretName string,
 	params map[string]string, secrets map[string]string) (*v1beta1.ServiceBinding, error) {
 
 	// Manually defaulting the name of the binding
@@ -78,7 +78,7 @@ func (cl *Client) Bind(namespace, bindingName, instanceName, secretName string,
 	return result, nil
 }
 
-func (cl *Client) Unbind(ns, instanceName string) error {
+func (cl *SDK) Unbind(ns, instanceName string) error {
 	instance := &v1beta1.ServiceInstance{
 		ObjectMeta: v1.ObjectMeta{
 			Namespace: ns,
@@ -116,7 +116,7 @@ func (cl *Client) Unbind(ns, instanceName string) error {
 	return bindErr.ErrorOrNil()
 }
 
-func (cl *Client) DeleteBinding(ns, bindingName string) error {
+func (cl *SDK) DeleteBinding(ns, bindingName string) error {
 	err := cl.ServicecatalogV1beta1().ServiceBindings(ns).Delete(bindingName, &v1.DeleteOptions{})
 	if err != nil {
 		return fmt.Errorf("remove binding %s/%s failed (%s)", ns, bindingName, err)
@@ -139,7 +139,7 @@ func joinErrors(groupMsg string, errors []error, sep string, a ...interface{}) s
 }
 
 // BindingParentHierarchy retrieves all ancestor resources of a binding.
-func (cl *Client) BindingParentHierarchy(binding *v1beta1.ServiceBinding,
+func (cl *SDK) BindingParentHierarchy(binding *v1beta1.ServiceBinding,
 ) (*v1beta1.ServiceInstance, *v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
 	instance, err := cl.RetrieveInstanceByBinding(binding)
 	if err != nil {

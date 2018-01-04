@@ -1,7 +1,8 @@
-package client
+package servicecatalog
 
 import "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 
-type Client struct {
+// SDK wrapper around the generated Go client for the Kubernetes Service Catalog
+type SDK struct {
 	*clientset.Clientset
 }

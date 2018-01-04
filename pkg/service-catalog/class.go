@@ -1,4 +1,4 @@
-package client
+package servicecatalog
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ const (
 	FieldExternalClassName = "spec.externalName"
 )
 
-func (cl *Client) RetrieveClasses() ([]v1beta1.ClusterServiceClass, error) {
+func (cl *SDK) RetrieveClasses() ([]v1beta1.ClusterServiceClass, error) {
 	classes, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list classes (%s)", err)
@@ -21,7 +21,7 @@ func (cl *Client) RetrieveClasses() ([]v1beta1.ClusterServiceClass, error) {
 	return classes.Items, nil
 }
 
-func (cl *Client) RetrieveClassByName(name string) (*v1beta1.ClusterServiceClass, error) {
+func (cl *SDK) RetrieveClassByName(name string) (*v1beta1.ClusterServiceClass, error) {
 	opts := v1.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(FieldExternalClassName, name).String(),
 	}
@@ -38,7 +38,7 @@ func (cl *Client) RetrieveClassByName(name string) (*v1beta1.ClusterServiceClass
 	return &searchResults.Items[0], nil
 }
 
-func (cl *Client) RetrieveClassByID(uuid string) (*v1beta1.ClusterServiceClass, error) {
+func (cl *SDK) RetrieveClassByID(uuid string) (*v1beta1.ClusterServiceClass, error) {
 	class, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(uuid, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get class (%s)", err)
@@ -46,7 +46,7 @@ func (cl *Client) RetrieveClassByID(uuid string) (*v1beta1.ClusterServiceClass, 
 	return class, nil
 }
 
-func (cl *Client) RetrieveClassByPlan(plan *v1beta1.ClusterServicePlan,
+func (cl *SDK) RetrieveClassByPlan(plan *v1beta1.ClusterServicePlan,
 ) (*v1beta1.ClusterServiceClass, error) {
 	// Retrieve the class as well because plans don't have the external class name
 	class, err := cl.ServicecatalogV1beta1().ClusterServiceClasses().Get(plan.Spec.ClusterServiceClassRef.Name, v1.GetOptions{})

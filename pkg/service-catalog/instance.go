@@ -1,4 +1,4 @@
-package client
+package servicecatalog
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ const (
 	FieldServicePlanRef = "spec.clusterServicePlanRef.name"
 )
 
-func (cl *Client) RetrieveInstances(ns string) (*v1beta1.ServiceInstanceList, error) {
+func (cl *SDK) RetrieveInstances(ns string) (*v1beta1.ServiceInstanceList, error) {
 	instances, err := cl.ServicecatalogV1beta1().ServiceInstances(ns).List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to list instances in %s (%s)", ns, err)
@@ -21,7 +21,7 @@ func (cl *Client) RetrieveInstances(ns string) (*v1beta1.ServiceInstanceList, er
 	return instances, nil
 }
 
-func (cl *Client) RetrieveInstance(ns, name string) (*v1beta1.ServiceInstance, error) {
+func (cl *SDK) RetrieveInstance(ns, name string) (*v1beta1.ServiceInstance, error) {
 	instance, err := cl.ServicecatalogV1beta1().ServiceInstances(ns).Get(name, v1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to get instance '%s.%s' (%s)", ns, name, err)
@@ -30,7 +30,7 @@ func (cl *Client) RetrieveInstance(ns, name string) (*v1beta1.ServiceInstance, e
 }
 
 // RetrieveInstanceByBinding retrieves the parent instance for a binding.
-func (cl *Client) RetrieveInstanceByBinding(b *v1beta1.ServiceBinding,
+func (cl *SDK) RetrieveInstanceByBinding(b *v1beta1.ServiceBinding,
 ) (*v1beta1.ServiceInstance, error) {
 	ns := b.Namespace
 	instName := b.Spec.ServiceInstanceRef.Name
@@ -42,7 +42,7 @@ func (cl *Client) RetrieveInstanceByBinding(b *v1beta1.ServiceBinding,
 }
 
 // RetrieveInstancesByPlan retrieves all instances of a plan.
-func (cl *Client) RetrieveInstancesByPlan(plan *v1beta1.ClusterServicePlan,
+func (cl *SDK) RetrieveInstancesByPlan(plan *v1beta1.ClusterServicePlan,
 ) ([]v1beta1.ServiceInstance, error) {
 	planOpts := v1.ListOptions{
 		FieldSelector: fields.OneTermEqualSelector(FieldServicePlanRef, plan.Name).String(),
@@ -56,7 +56,7 @@ func (cl *Client) RetrieveInstancesByPlan(plan *v1beta1.ClusterServicePlan,
 }
 
 // InstanceParentHierarchy retrieves all ancestor resources of an instance.
-func (cl *Client) InstanceParentHierarchy(instance *v1beta1.ServiceInstance,
+func (cl *SDK) InstanceParentHierarchy(instance *v1beta1.ServiceInstance,
 ) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, *v1beta1.ClusterServiceBroker, error) {
 	class, plan, err := cl.InstanceToServiceClassAndPlan(instance)
 	if err != nil {
@@ -72,7 +72,7 @@ func (cl *Client) InstanceParentHierarchy(instance *v1beta1.ServiceInstance,
 }
 
 // InstanceToServiceClassAndPlan retrieves the parent class and plan for an instance.
-func (cl *Client) InstanceToServiceClassAndPlan(instance *v1beta1.ServiceInstance,
+func (cl *SDK) InstanceToServiceClassAndPlan(instance *v1beta1.ServiceInstance,
 ) (*v1beta1.ClusterServiceClass, *v1beta1.ClusterServicePlan, error) {
 	classID := instance.Spec.ClusterServiceClassRef.Name
 	classCh := make(chan *v1beta1.ClusterServiceClass)
@@ -121,7 +121,7 @@ func (cl *Client) InstanceToServiceClassAndPlan(instance *v1beta1.ServiceInstanc
 	}
 }
 
-func (cl *Client) Provision(namespace, instanceName, className, planName string,
+func (cl *SDK) Provision(namespace, instanceName, className, planName string,
 	params map[string]string, secrets map[string]string) (*v1beta1.ServiceInstance, error) {
 
 	request := &v1beta1.ServiceInstance{
@@ -146,7 +146,7 @@ func (cl *Client) Provision(namespace, instanceName, className, planName string,
 	return result, nil
 }
 
-func (cl *Client) Deprovision(namespace, instanceName string) error {
+func (cl *SDK) Deprovision(namespace, instanceName string) error {
 	err := cl.ServicecatalogV1beta1().ServiceInstances(namespace).Delete(instanceName, &v1.DeleteOptions{})
 	if err != nil {
 		return fmt.Errorf("deprovision request failed (%s)", err)
