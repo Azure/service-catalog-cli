@@ -49,7 +49,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	bindings, err := c.Client.RetrieveBindings(c.ns)
+	bindings, err := c.App.RetrieveBindings(c.ns)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get() error {
-	binding, err := c.Client.RetrieveBinding(c.ns, c.name)
+	binding, err := c.App.RetrieveBinding(c.ns, c.name)
 	if err != nil {
 		return err
 	}

@@ -40,7 +40,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	brokers, err := c.Client.RetrieveBrokers()
+	brokers, err := c.App.RetrieveBrokers()
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get() error {
-	broker, err := c.Client.RetrieveBroker(c.name)
+	broker, err := c.App.RetrieveBroker(c.name)
 	if err != nil {
 		return err
 	}

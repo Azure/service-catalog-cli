@@ -72,7 +72,7 @@ func (c *provisonCmd) run(args []string) error {
 }
 
 func (c *provisonCmd) provision() error {
-	instance, err := c.Client.Provision(c.ns, c.instanceName, c.className, c.planName, c.params, c.secrets)
+	instance, err := c.App.Provision(c.ns, c.instanceName, c.className, c.planName, c.params, c.secrets)
 	if err != nil {
 		return err
 	}

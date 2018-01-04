@@ -41,5 +41,5 @@ func (c *deprovisonCmd) run(args []string) error {
 }
 
 func (c *deprovisonCmd) deprovision() error {
-	return c.Client.Deprovision(c.ns, c.instanceName)
+	return c.App.Deprovision(c.ns, c.instanceName)
 }

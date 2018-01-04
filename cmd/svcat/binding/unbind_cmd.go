@@ -51,9 +51,9 @@ func (c *unbindCmd) run(args []string) error {
 			return fmt.Errorf("an instance or binding name is required")
 		}
 
-		return c.Client.DeleteBinding(c.ns, c.bindingName)
+		return c.App.DeleteBinding(c.ns, c.bindingName)
 	} else {
 		c.instanceName = args[0]
-		return c.Client.Unbind(c.ns, c.instanceName)
+		return c.App.Unbind(c.ns, c.instanceName)
 	}
 }

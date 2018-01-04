@@ -67,9 +67,9 @@ func (c *describeCmd) describe() error {
 	var class *v1beta1.ClusterServiceClass
 	var err error
 	if c.lookupByUUID {
-		class, err = c.Client.RetrieveClassByID(c.uuid)
+		class, err = c.App.RetrieveClassByID(c.uuid)
 	} else {
-		class, err = c.Client.RetrieveClassByName(c.name)
+		class, err = c.App.RetrieveClassByName(c.name)
 	}
 	if err != nil {
 		return err
@@ -77,14 +77,14 @@ func (c *describeCmd) describe() error {
 
 	output.WriteClassDetails(c.Output, class)
 
-	plans, err := c.Client.RetrievePlansByClass(class)
+	plans, err := c.App.RetrievePlansByClass(class)
 	if err != nil {
 		return err
 	}
 	output.WriteAssociatedPlans(c.Output, plans)
 
 	if c.traverse {
-		broker, err := c.Client.RetrieveBrokerByClass(class)
+		broker, err := c.App.RetrieveBrokerByClass(class)
 		if err != nil {
 			return err
 		}

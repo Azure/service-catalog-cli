@@ -11,11 +11,8 @@ import (
 	"github.com/Azure/service-catalog-cli/cmd/svcat/instance"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/plan"
 	"github.com/Azure/service-catalog-cli/pkg/environment"
-	"github.com/Azure/service-catalog-cli/pkg/kube"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
-	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
+	"github.com/Azure/service-catalog-cli/pkg/svcat"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/rest"
 )
 
 // These are build-time values, set during an official release
@@ -49,15 +46,13 @@ func buildRootCommand() *cobra.Command {
 			// Enable tests to swap the output
 			cxt.Output = cmd.OutOrStdout()
 
-			// Initialize a service catalog client
+			// Initialize flags from environment variables
 			env.Init()
-			_, cl, err := getKubeClient(env)
-			if err != nil {
-				return fmt.Errorf("Error connecting to Kubernetes (%s)", err)
-			}
-			cxt.Client = &client.Client{Clientset: cl}
 
-			return nil
+			app, err := svcat.NewApp(env.KubeConfig, env.KubeContext)
+			cxt.App = app
+
+			return err
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Version {
@@ -90,25 +85,6 @@ func printVersion(cxt *command.Context) {
 	} else {
 		fmt.Fprintf(cxt.Output, "svcat %s (%s)\n", version, commit)
 	}
-}
-
-// configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
-func configForContext(vars environment.EnvSettings) (*rest.Config, error) {
-	config, err := kube.GetConfig(vars.KubeContext, vars.KubeConfig).ClientConfig()
-	if err != nil {
-		return nil, fmt.Errorf("could not get Kubernetes config for context %q: %s", vars.KubeContext, err)
-	}
-	return config, nil
-}
-
-// getKubeClient creates a Kubernetes config and client for a given kubeconfig context.
-func getKubeClient(vars environment.EnvSettings) (*rest.Config, *clientset.Clientset, error) {
-	config, err := configForContext(vars)
-	if err != nil {
-		return nil, nil, fmt.Errorf("Error getting Kubernetes configuration (%s)", err)
-	}
-	client, err := clientset.NewForConfig(config)
-	return nil, client, err
 }
 
 func newSyncCmd(cxt *command.Context) *cobra.Command {

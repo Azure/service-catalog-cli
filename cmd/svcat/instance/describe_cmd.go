@@ -56,21 +56,21 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe() error {
-	instance, err := c.Client.RetrieveInstance(c.ns, c.name)
+	instance, err := c.App.RetrieveInstance(c.ns, c.name)
 	if err != nil {
 		return err
 	}
 
 	output.WriteInstanceDetails(c.Output, instance)
 
-	bindings, err := c.Client.RetrieveBindingsByInstance(instance)
+	bindings, err := c.App.RetrieveBindingsByInstance(instance)
 	if err != nil {
 		return err
 	}
 	output.WriteAssociatedBindings(c.Output, bindings)
 
 	if c.traverse {
-		class, plan, broker, err := c.Client.InstanceParentHierarchy(instance)
+		class, plan, broker, err := c.App.InstanceParentHierarchy(instance)
 		if err != nil {
 			return fmt.Errorf("unable to traverse up the instance hierarchy (%s)", err)
 		}

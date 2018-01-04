@@ -42,7 +42,7 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe() error {
-	broker, err := c.Client.RetrieveBroker(c.name)
+	broker, err := c.App.RetrieveBroker(c.name)
 	if err != nil {
 		return err
 	}
