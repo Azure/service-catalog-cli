@@ -5,7 +5,6 @@ import (
 
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/spf13/cobra"
 )
@@ -58,13 +57,13 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	plans, err := client.RetrievePlans(c.Client)
+	plans, err := c.Client.RetrievePlans()
 	if err != nil {
 		return fmt.Errorf("unable to list plans (%s)", err)
 	}
 
 	// Retrieve the classes as well because plans don't have the external class name
-	classes, err := client.RetrieveClasses(c.Client)
+	classes, err := c.Client.RetrieveClasses()
 	if err != nil {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
@@ -77,13 +76,13 @@ func (c *getCmd) get() error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = client.RetrievePlanByID(c.Client, c.uuid)
+		plan, err = c.Client.RetrievePlanByID(c.uuid)
 	} else {
-		plan, err = client.RetrievePlanByName(c.Client, c.name)
+		plan, err = c.Client.RetrievePlanByName(c.name)
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := client.RetrieveClassByName(c.Client, plan.Spec.ClusterServiceClassRef.Name)
+	class, err := c.Client.RetrieveClassByName(plan.Spec.ClusterServiceClassRef.Name)
 	if err != nil {
 		return err
 	}

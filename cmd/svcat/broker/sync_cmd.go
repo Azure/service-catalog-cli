@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -36,7 +35,7 @@ func (c *syncCmd) run(args []string) error {
 
 func (c *syncCmd) sync() error {
 	const retries = 3
-	err := client.Sync(c.Client, c.name, retries)
+	err := c.Client.Sync(c.name, retries)
 	if err != nil {
 		return err
 	}

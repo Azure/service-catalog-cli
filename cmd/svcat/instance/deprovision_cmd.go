@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -42,5 +41,5 @@ func (c *deprovisonCmd) run(args []string) error {
 }
 
 func (c *deprovisonCmd) deprovision() error {
-	return client.Deprovision(c.Client, c.ns, c.instanceName)
+	return c.Client.Deprovision(c.ns, c.instanceName)
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/Azure/service-catalog-cli/cmd/svcat/plan"
 	"github.com/Azure/service-catalog-cli/pkg/environment"
 	"github.com/Azure/service-catalog-cli/pkg/kube"
+	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/rest"
@@ -54,7 +55,7 @@ func buildRootCommand() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("Error connecting to Kubernetes (%s)", err)
 			}
-			cxt.Client = cl
+			cxt.Client = &client.Client{Clientset: cl}
 
 			return nil
 		},

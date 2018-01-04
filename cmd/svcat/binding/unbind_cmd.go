@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -52,9 +51,9 @@ func (c *unbindCmd) run(args []string) error {
 			return fmt.Errorf("an instance or binding name is required")
 		}
 
-		return client.DeleteBinding(c.Client, c.ns, c.bindingName)
+		return c.Client.DeleteBinding(c.ns, c.bindingName)
 	} else {
 		c.instanceName = args[0]
-		return client.Unbind(c.Client, c.ns, c.instanceName)
+		return c.Client.Unbind(c.ns, c.instanceName)
 	}
 }

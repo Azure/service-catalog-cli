@@ -5,7 +5,6 @@ import (
 
 	"github.com/Azure/service-catalog-cli/cmd/svcat/command"
 	"github.com/Azure/service-catalog-cli/cmd/svcat/output"
-	"github.com/Azure/service-catalog-cli/pkg/service-catalog/client"
 	"github.com/spf13/cobra"
 )
 
@@ -57,21 +56,21 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe() error {
-	instance, err := client.RetrieveInstance(c.Client, c.ns, c.name)
+	instance, err := c.Client.RetrieveInstance(c.ns, c.name)
 	if err != nil {
 		return err
 	}
 
 	output.WriteInstanceDetails(c.Output, instance)
 
-	bindings, err := client.RetrieveBindingsByInstance(c.Client, instance)
+	bindings, err := c.Client.RetrieveBindingsByInstance(instance)
 	if err != nil {
 		return err
 	}
 	output.WriteAssociatedBindings(c.Output, bindings)
 
 	if c.traverse {
-		class, plan, broker, err := client.InstanceParentHierarchy(c.Client, instance)
+		class, plan, broker, err := c.Client.InstanceParentHierarchy(instance)
 		if err != nil {
 			return fmt.Errorf("unable to traverse up the instance hierarchy (%s)", err)
 		}
