@@ -37,7 +37,7 @@ func (sdk *SDK) RetrieveBrokerByClass(class *v1beta1.ClusterServiceClass,
 }
 
 func (sdk *SDK) Sync(name string, retries int) error {
-	for j := 0; j < retries; j++ {
+	for j := 0; j <= retries; j++ {
 		catalog, err := sdk.RetrieveBroker(name)
 		if err != nil {
 			return err
