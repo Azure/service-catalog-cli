@@ -48,7 +48,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	instances, err := c.Client.RetrieveInstances(c.ns)
+	instances, err := c.App.RetrieveInstances(c.ns)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (c *getCmd) getAll() error {
 }
 
 func (c *getCmd) get() error {
-	instance, err := c.Client.RetrieveInstance(c.ns, c.name)
+	instance, err := c.App.RetrieveInstance(c.ns, c.name)
 	if err != nil {
 		return err
 	}

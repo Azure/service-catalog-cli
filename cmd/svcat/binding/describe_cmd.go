@@ -56,7 +56,7 @@ func (c *describeCmd) run(args []string) error {
 }
 
 func (c *describeCmd) describe() error {
-	binding, err := c.Client.RetrieveBinding(c.ns, c.name)
+	binding, err := c.App.RetrieveBinding(c.ns, c.name)
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func (c *describeCmd) describe() error {
 	output.WriteBindingDetails(c.Output, binding)
 
 	if c.traverse {
-		instance, class, plan, broker, err := c.Client.BindingParentHierarchy(binding)
+		instance, class, plan, broker, err := c.App.BindingParentHierarchy(binding)
 		if err != nil {
 			return fmt.Errorf("unable to traverse up the binding hierarchy (%s)", err)
 		}

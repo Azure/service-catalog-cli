@@ -57,13 +57,13 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	plans, err := c.Client.RetrievePlans()
+	plans, err := c.App.RetrievePlans()
 	if err != nil {
 		return fmt.Errorf("unable to list plans (%s)", err)
 	}
 
 	// Retrieve the classes as well because plans don't have the external class name
-	classes, err := c.Client.RetrieveClasses()
+	classes, err := c.App.RetrieveClasses()
 	if err != nil {
 		return fmt.Errorf("unable to list classes (%s)", err)
 	}
@@ -76,13 +76,13 @@ func (c *getCmd) get() error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = c.Client.RetrievePlanByID(c.uuid)
+		plan, err = c.App.RetrievePlanByID(c.uuid)
 	} else {
-		plan, err = c.Client.RetrievePlanByName(c.name)
+		plan, err = c.App.RetrievePlanByName(c.name)
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := c.Client.RetrieveClassByName(plan.Spec.ClusterServiceClassRef.Name)
+	class, err := c.App.RetrieveClassByName(plan.Spec.ClusterServiceClassRef.Name)
 	if err != nil {
 		return err
 	}

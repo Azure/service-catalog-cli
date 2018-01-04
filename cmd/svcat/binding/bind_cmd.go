@@ -85,7 +85,7 @@ func (c *bindCmd) run(args []string) error {
 }
 
 func (c *bindCmd) bind() error {
-	binding, err := c.Client.Bind(c.ns, c.bindingName, c.instanceName, c.secretName, c.params, c.secrets)
+	binding, err := c.App.Bind(c.ns, c.bindingName, c.instanceName, c.secretName, c.params, c.secrets)
 	if err != nil {
 		return err
 	}

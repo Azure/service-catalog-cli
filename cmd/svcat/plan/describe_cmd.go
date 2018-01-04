@@ -67,30 +67,30 @@ func (c *describeCmd) describe() error {
 	var plan *v1beta1.ClusterServicePlan
 	var err error
 	if c.lookupByUUID {
-		plan, err = c.Client.RetrievePlanByID(c.uuid)
+		plan, err = c.App.RetrievePlanByID(c.uuid)
 	} else {
-		plan, err = c.Client.RetrievePlanByName(c.name)
+		plan, err = c.App.RetrievePlanByName(c.name)
 	}
 	if err != nil {
 		return err
 	}
 
 	// Retrieve the class as well because plans don't have the external class name
-	class, err := c.Client.RetrieveClassByPlan(plan)
+	class, err := c.App.RetrieveClassByPlan(plan)
 	if err != nil {
 		return err
 	}
 
 	output.WritePlanDetails(c.Output, plan, class)
 
-	instances, err := c.Client.RetrieveInstancesByPlan(plan)
+	instances, err := c.App.RetrieveInstancesByPlan(plan)
 	if err != nil {
 		return err
 	}
 	output.WriteAssociatedInstances(c.Output, instances)
 
 	if c.traverse {
-		broker, err := c.Client.RetrieveBrokerByClass(class)
+		broker, err := c.App.RetrieveBrokerByClass(class)
 		if err != nil {
 			return err
 		}

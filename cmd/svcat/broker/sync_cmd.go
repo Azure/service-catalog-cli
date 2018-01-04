@@ -35,11 +35,11 @@ func (c *syncCmd) run(args []string) error {
 
 func (c *syncCmd) sync() error {
 	const retries = 3
-	err := c.Client.Sync(c.name, retries)
+	err := c.App.Sync(c.name, retries)
 	if err != nil {
 		return err
 	}
 
-	fmt.Fprintf(c.Output, "Successfully fetched catalog entries from %s broker", c.name)
+	fmt.Fprintf(c.Output, "Successfully fetched catalog entries from the %s broker\n", c.name)
 	return nil
 }

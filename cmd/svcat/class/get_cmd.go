@@ -55,7 +55,7 @@ func (c *getCmd) run(args []string) error {
 }
 
 func (c *getCmd) getAll() error {
-	classes, err := c.Client.RetrieveClasses()
+	classes, err := c.App.RetrieveClasses()
 	if err != nil {
 		return err
 	}
@@ -69,9 +69,9 @@ func (c *getCmd) get() error {
 	var err error
 
 	if c.lookupByUUID {
-		class, err = c.Client.RetrieveClassByID(c.uuid)
+		class, err = c.App.RetrieveClassByID(c.uuid)
 	} else if c.name != "" {
-		class, err = c.Client.RetrieveClassByName(c.name)
+		class, err = c.App.RetrieveClassByName(c.name)
 	}
 	if err != nil {
 		return err
