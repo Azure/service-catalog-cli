@@ -23,6 +23,7 @@ In order to use `svcat`, you will need:
 
 * A Kubernetes cluster running v1.7+ or higher
 * A broker compatible with the Open Service Broker API installed on the cluster, such as:
+  * [User Provided Service Broker](https://github.com/kubernetes-incubator/service-catalog/tree/master/charts/ups-broker)
   * [Open Service Broke for Azure](https://github.com/Azure/helm-charts/tree/master/open-service-broker-azure)
 * The [Service Catalog](https://github.com/kubernetes-incubator/service-catalog/blob/master/docs/install.md) installed on the cluster.
 
