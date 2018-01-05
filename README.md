@@ -4,12 +4,7 @@
 
 This project is a command-line interface (CLI) for interacting with
 [Kubernetes Service Catalog](https://github.com/kubernetes-incubator/service-catalog)
-resources.
-
-| 🚨  | Our releases follow [semver](https://semver.org) and the project is in **alpha** status. This means that no assurances are made about backwards compatibility or stability. Before we hit v1.0.0, breaking changes are indicated by bumping the minor version. |
-|---|---|
-
-`svcat` is a domain-specific tool to make interacting with the Service Catalog easier.
+resources. `svcat` is a domain-specific tool to make interacting with the Service Catalog easier.
 While many of its commands have analogs to `kubectl`, our goal is to streamline and optimize
 the operator experience, contributing useful code back upstream to Kubernetes where applicable.
 
@@ -23,6 +18,7 @@ In order to use `svcat`, you will need:
 
 * A Kubernetes cluster running v1.7+ or higher
 * A broker compatible with the Open Service Broker API installed on the cluster, such as:
+  * [User Provided Service Broker](https://github.com/kubernetes-incubator/service-catalog/tree/master/charts/ups-broker)
   * [Open Service Broke for Azure](https://github.com/Azure/helm-charts/tree/master/open-service-broker-azure)
 * The [Service Catalog](https://github.com/kubernetes-incubator/service-catalog/blob/master/docs/install.md) installed on the cluster.
 
