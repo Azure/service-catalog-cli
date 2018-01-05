@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/Azure/service-catalog-cli/pkg/environment"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
@@ -15,26 +16,37 @@ var (
 
 type TestSettings struct {
 	environment.EnvSettings
+	Namespace string
 }
 
 // Verify that we can connect to the test cluster before starting any tests
-func (s TestSettings) Verify() {
-	_, err := NewApp(Settings.KubeConfig, Settings.KubeContext)
+func (s TestSettings) Verify() *App {
+	svcat, err := NewApp(Settings.KubeConfig, Settings.KubeContext)
 	if err != nil {
 		fmt.Printf("%s\nSettings: %+v\n", err, Settings.EnvSettings)
 		os.Exit(1)
 	}
+
+	return svcat
 }
 
 func TestMain(m *testing.M) {
 	// Load overrides to the cluster connection from environment variables
 	Settings.Init()
-	Settings.Verify()
+	svcat := Settings.Verify()
 
-	os.Exit(m.Run())
+	// Setup
+	Settings.Namespace = CreateTestNamespace(svcat)
+
+	retCode := m.Run()
+
+	// Teardown
+	//DeleteTestNamespace(svcat)
+
+	os.Exit(retCode)
 }
 
-func GetTestApp(t *testing.T) *App {
+func NewTestApp(t *testing.T) *App {
 	t.Helper()
 
 	svcat, err := NewApp(Settings.KubeConfig, Settings.KubeContext)
@@ -58,4 +70,25 @@ func GetTestBroker(t *testing.T, svcat *App) *v1beta1.ClusterServiceBroker {
 	}
 
 	return &brokers[0]
+}
+
+func CreateTestNamespace(svcat *App) string {
+	name := fmt.Sprintf("test-%d", time.Now().Unix())
+	fmt.Printf("Creating test namespace: %s\n", name)
+	namespace, err := svcat.Kube.CreateNamespace(name)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	return namespace.Name
+}
+
+func DeleteTestNamespace(svcat *App) {
+	fmt.Printf("Cleaning up test namespace: %s\n", Settings.Namespace)
+	err := svcat.Kube.DeleteNamespace(Settings.Namespace)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

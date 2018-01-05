@@ -63,7 +63,7 @@ func (c *describeCmd) describe() error {
 
 	output.WriteInstanceDetails(c.Output, instance)
 
-	bindings, err := c.App.RetrieveBindingsByInstance(instance)
+	bindings, err := c.App.RetrieveBindingsByInstance(instance.Namespace, instance.Name)
 	if err != nil {
 		return err
 	}

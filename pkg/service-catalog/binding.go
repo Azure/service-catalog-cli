@@ -28,17 +28,16 @@ func (sdk *SDK) RetrieveBinding(ns, name string) (*v1beta1.ServiceBinding, error
 }
 
 // RetrieveBindingsByInstance retrieves all child bindings for an instance.
-func (sdk *SDK) RetrieveBindingsByInstance(instance *v1beta1.ServiceInstance,
-) ([]v1beta1.ServiceBinding, error) {
+func (sdk *SDK) RetrieveBindingsByInstance(ns, instanceName string) ([]v1beta1.ServiceBinding, error) {
 	// Not using a filtered list operation because it's not supported yet.
-	results, err := sdk.ServiceCatalog().ServiceBindings(instance.Namespace).List(v1.ListOptions{})
+	results, err := sdk.ServiceCatalog().ServiceBindings(ns).List(v1.ListOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to search bindings (%s)", err)
 	}
 
 	var bindings []v1beta1.ServiceBinding
 	for _, binding := range results.Items {
-		if binding.Spec.ServiceInstanceRef.Name == instance.Name {
+		if binding.Spec.ServiceInstanceRef.Name == instanceName {
 			bindings = append(bindings, binding)
 		}
 	}
@@ -85,7 +84,7 @@ func (sdk *SDK) Unbind(ns, instanceName string) error {
 			Name:      instanceName,
 		},
 	}
-	bindings, err := sdk.RetrieveBindingsByInstance(instance)
+	bindings, err := sdk.RetrieveBindingsByInstance(instance.Namespace, instance.Name)
 	if err != nil {
 		return err
 	}

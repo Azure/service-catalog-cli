@@ -8,8 +8,9 @@ import (
 
 func TestIntegrationBrokerGetAll(t *testing.T) {
 	test.FilterTestSuite(t)
+	t.Parallel()
 
-	svcat := GetTestApp(t)
+	svcat := NewTestApp(t)
 
 	brokers, err := svcat.RetrieveBrokers()
 	if err != nil {
@@ -23,8 +24,9 @@ func TestIntegrationBrokerGetAll(t *testing.T) {
 
 func TestIntegrationBrokerGet(t *testing.T) {
 	test.FilterTestSuite(t)
+	t.Parallel()
 
-	svcat := GetTestApp(t)
+	svcat := NewTestApp(t)
 	brokerName := GetTestBroker(t, svcat).Name
 
 	broker, err := svcat.RetrieveBroker(brokerName)
@@ -39,8 +41,9 @@ func TestIntegrationBrokerGet(t *testing.T) {
 
 func TestIntegrationBrokerSync(t *testing.T) {
 	test.FilterTestSuite(t)
+	t.Parallel()
 
-	svcat := GetTestApp(t)
+	svcat := NewTestApp(t)
 	brokerName := GetTestBroker(t, svcat).Name
 
 	err := svcat.Sync(brokerName, 0)
