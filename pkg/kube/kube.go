@@ -2,6 +2,8 @@ package kube
 
 import (
 	"k8s.io/client-go/tools/clientcmd"
+
+	_ "k8s.io/client-go/plugin/pkg/client/auth" // Load all client auth plugins for gcp, azure, etc
 )
 
 // GetConfig returns a Kubernetes client config for a given context.
