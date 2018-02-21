@@ -166,7 +166,7 @@ $ svcat get bindings --namespace cms
 ## Bind an instance
 
 ```console
-$ svcat bind quickstart-wordpress-mysql-instance
+$ svcat bind quickstart-wordpress-mysql-instance \
     --name quickstart-wordpress-mysql-binding \
     --secret-name quickstart-wordpress-secret
 ```
