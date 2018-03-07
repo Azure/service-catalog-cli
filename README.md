@@ -1,6 +1,8 @@
 # Service Catalog CLI
 
-[![CircleCI](https://circleci.com/gh/Azure/service-catalog-cli.svg?style=svg&circle-token=98d6d64c981e70b76736fb3f05a0b41b4fec47cf)](https://circleci.com/gh/Azure/service-catalog-cli)
+| 🚨  | This repository has been gifted upstream to [Kubernetes Service Catalog](https://github.com/kubernetes-incubator/service-catalog). Like a salmon after spawning season, its purpose having been achieved, this repo is now closed for business.
+|---|---|
+
 
 This project is a command-line interface (CLI) for interacting with
 [Kubernetes Service Catalog](https://github.com/kubernetes-incubator/service-catalog)
